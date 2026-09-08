@@ -35,7 +35,7 @@ import { Plus, LayoutDashboard, ReceiptText, CalendarCheck, Target, Users } from
 export default function Home() {
   const [currentMonth, setCurrentMonth] = useState<string>(() => getMonthKey());
   const [settings, setSettingsState] = useState<AppSettings>(() => loadSettings());
-  const [budget, setBudget] = useState<MonthlyBudget | null>(null);
+  const [budget, setBudget] = useState<MonthlyBudget>(() => loadLocalMonth(getMonthKey()));
   const [selectedPersonId, setSelectedPersonId] = useState<PersonId | 'all'>('all');
   const [isCloudConnected, setIsCloudConnected] = useState<boolean>(false);
   const [currentView, setCurrentView] = useState<AppView>('dashboard');
@@ -279,17 +279,6 @@ export default function Home() {
       alert('Firebase yapılandırma formatı geçersiz. Lütfen geçerli bir JSON girin.');
     }
   };
-
-  if (!budget) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
-        <div className="text-center">
-          <div className="w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm font-semibold text-zinc-600">Bütçe yükleniyor...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-zinc-100 text-zinc-900 pb-24 sm:pb-12">
