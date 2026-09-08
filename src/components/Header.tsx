@@ -12,9 +12,10 @@ import {
   LayoutDashboard,
   ReceiptText,
   CalendarCheck,
+  Target,
 } from 'lucide-react';
 
-export type AppView = 'dashboard' | 'accounting' | 'bills';
+export type AppView = 'dashboard' | 'accounting' | 'bills' | 'budget';
 
 interface HeaderProps {
   currentMonth: string;
@@ -113,6 +114,18 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <CalendarCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Faturalar</span>
+              </button>
+
+              <button
+                onClick={() => onViewChange('budget')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                  activeView === 'budget'
+                    ? 'bg-white text-emerald-700 shadow-xs'
+                    : 'text-zinc-600 hover:text-zinc-900'
+                }`}
+              >
+                <Target className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Bütçe</span>
               </button>
             </nav>
           </div>

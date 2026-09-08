@@ -1,4 +1,4 @@
-import { Person, Category, AppSettings } from '@/types/budget';
+import { Person, Category, AppSettings, QuickExpenseTemplate } from '@/types/budget';
 
 export const DEFAULT_PERSONS: Person[] = [
   { id: 'anne', name: 'Anne', role: 'Anne', color: 'bg-rose-100 text-rose-700 border-rose-200', avatar: '👩' },
@@ -33,8 +33,20 @@ export const DEFAULT_FIXED_TEMPLATES = [
   { title: 'Cep Telefonu (Baba)', expectedAmount: 0, categoryId: 'fatura', personId: 'baba', dueDate: 22 },
 ];
 
+export const DEFAULT_QUICK_TEMPLATES: QuickExpenseTemplate[] = [
+  { id: 'qt_1', title: 'Fırın & Ekmek', amount: 35, categoryId: 'market', icon: '🥖', paymentMethod: 'nakit' },
+  { id: 'qt_2', title: 'Damacana Su', amount: 130, categoryId: 'market', icon: '💧', paymentMethod: 'nakit' },
+  { id: 'qt_3', title: 'Akaryakıt / Benzin', amount: 1500, categoryId: 'ulasim', icon: '⛽', paymentMethod: 'kredi_karti' },
+  { id: 'qt_4', title: 'Dışarıda Kahve / Çay', amount: 120, categoryId: 'yemek', icon: '☕', paymentMethod: 'kredi_karti' },
+  { id: 'qt_5', title: 'Mini Market / Bakkal', amount: 250, categoryId: 'market', icon: '🛒', paymentMethod: 'kredi_karti' },
+  { id: 'qt_6', title: 'Kasap / Şarküteri', amount: 800, categoryId: 'kasap', icon: '🥩', paymentMethod: 'kredi_karti' },
+  { id: 'qt_7', title: 'Eczane & Sağlık', amount: 300, categoryId: 'saglik', icon: '💊', paymentMethod: 'kredi_karti' },
+  { id: 'qt_8', title: 'Taksi / Ulaşım', amount: 250, categoryId: 'ulasim', icon: '🚕', paymentMethod: 'kredi_karti' },
+];
+
 export const DEFAULT_APP_SETTINGS: AppSettings = {
   persons: DEFAULT_PERSONS,
   categories: DEFAULT_CATEGORIES,
   defaultFixedExpenses: DEFAULT_FIXED_TEMPLATES,
+  quickTemplates: DEFAULT_QUICK_TEMPLATES,
 };

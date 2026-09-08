@@ -12,6 +12,7 @@ interface AddExpenseModalProps {
   categories: Category[];
   onAddExpense: (expense: Omit<ExpenseItem, 'id' | 'createdAt'>) => void;
   defaultPersonId?: PersonId;
+  initialPreset?: Partial<ExpenseItem> | null;
 }
 
 export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
@@ -21,6 +22,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   categories,
   onAddExpense,
   defaultPersonId,
+  initialPreset,
 }) => {
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -32,8 +34,17 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setSelectedPerson(defaultPersonId || persons[0]?.id || 'ortak');
+      if (initialPreset) {
+        setTitle(initialPreset.title || '');
+        setAmount(initialPreset.amount ? formatAmountInput(String(initialPreset.amount)) : '');
+        setSelectedCategory(initialPreset.categoryId || 'market');
+        setPaymentMethod(initialPreset.paymentMethod === 'nakit' ? 'nakit' : 'kredi_karti');
+      } else {
+        setTitle('');
+        setAmount('');
+      }
     }
-  }, [isOpen, defaultPersonId, persons]);
+  }, [isOpen, defaultPersonId, persons, initialPreset]);
   const [date, setDate] = useState(todayStr);
   const [paymentMethod, setPaymentMethod] = useState<'kredi_karti' | 'nakit'>('kredi_karti');
   const [note, setNote] = useState('');

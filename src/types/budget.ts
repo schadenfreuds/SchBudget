@@ -70,6 +70,8 @@ export interface MonthlyBudget {
   incomes: IncomeItem[];
   fixedExpenses: FixedExpenseItem[];
   expenses: ExpenseItem[];
+  budgetLimit?: number; // Aylık tavan harcama hedefi (örn: 50.000 ₺)
+  savingsTarget?: number; // Aylık tasarruf hedefi (örn: 15.000 ₺)
   notes?: string;
 }
 
@@ -82,8 +84,18 @@ export interface FixedExpenseTemplate {
   dueDate?: number;
 }
 
+export interface QuickExpenseTemplate {
+  id: string;
+  title: string;
+  amount: number;
+  categoryId: string;
+  icon?: string;
+  paymentMethod?: 'kredi_karti' | 'nakit';
+}
+
 export interface AppSettings {
   persons: Person[];
   categories: Category[];
   defaultFixedExpenses: FixedExpenseTemplate[];
+  quickTemplates?: QuickExpenseTemplate[];
 }
