@@ -66,20 +66,20 @@ export const EditFixedExpenseModal: React.FC<EditFixedExpenseModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
-      <div className="bg-white rounded-2xl max-w-md w-full shadow-xl border border-zinc-200 overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full shadow-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden flex flex-col max-h-[92vh]">
         
         {/* Üst Bar */}
-        <div className="px-5 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50">
+        <div className="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-zinc-800/50">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 flex items-center justify-center">
               <Edit2 className="w-3.5 h-3.5" />
             </div>
-            <h3 className="font-bold text-base text-zinc-900">Sabit Gideri / Faturayı Düzenle</h3>
+            <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100">Sabit Gideri / Faturayı Düzenle</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200 transition cursor-pointer"
+            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -89,7 +89,7 @@ export const EditFixedExpenseModal: React.FC<EditFixedExpenseModalProps> = ({
           
           {/* Fatura Başlığı */}
           <div>
-            <label className="block text-xs font-semibold text-zinc-600 mb-1">
+            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
               Fatura / Gider Adı *
             </label>
             <input
@@ -98,14 +98,14 @@ export const EditFixedExpenseModal: React.FC<EditFixedExpenseModalProps> = ({
               placeholder="Örn: Elektrik Faturası, Kira, Aidat..."
               value={title}
               onChange={e => setTitle(e.target.value)}
-              className="w-full px-3 py-2 text-sm font-semibold border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full px-3 py-2 text-sm font-semibold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
             />
           </div>
 
           {/* Beklenen ve Gerçekleşen Tutar */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-zinc-600 mb-1">
+              <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
                 Fatura Tutarı (₺) *
               </label>
               <div className="relative">
@@ -116,16 +116,16 @@ export const EditFixedExpenseModal: React.FC<EditFixedExpenseModalProps> = ({
                   placeholder="0"
                   value={actualAmount}
                   onChange={e => setActualAmount(formatAmountInput(e.target.value))}
-                  className="w-full px-3 py-2 text-base font-bold text-zinc-900 border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 text-base font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400">
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-400 dark:text-zinc-500">
                   ₺
                 </span>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-zinc-600 mb-1">
+              <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
                 Son Ödeme Günü (1-31)
               </label>
               <div className="relative">
@@ -136,16 +136,16 @@ export const EditFixedExpenseModal: React.FC<EditFixedExpenseModalProps> = ({
                   placeholder="Örn: 15"
                   value={dueDate}
                   onChange={e => setDueDate(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
                 />
-                <Calendar className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+                <Calendar className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
               </div>
             </div>
           </div>
 
           {/* İlgili Kişi */}
           <div>
-            <label className="block text-xs font-semibold text-zinc-600 mb-1.5">
+            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">
               Kime Ait? *
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -158,15 +158,15 @@ export const EditFixedExpenseModal: React.FC<EditFixedExpenseModalProps> = ({
                     onClick={() => setSelectedPerson(person.id)}
                     className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between border transition cursor-pointer ${
                       isSelected
-                        ? 'border-emerald-600 bg-emerald-50 text-emerald-900 ring-1 ring-emerald-500'
-                        : 'border-zinc-200 text-zinc-700 hover:bg-zinc-50'
+                        ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 ring-1 ring-emerald-500'
+                        : 'border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800'
                     }`}
                   >
                     <div className="flex items-center gap-1.5">
                       <span className="text-base">{person.avatar}</span>
                       <span>{person.name}</span>
                     </div>
-                    {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600" />}
+                    {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />}
                   </button>
                 );
               })}
@@ -175,10 +175,10 @@ export const EditFixedExpenseModal: React.FC<EditFixedExpenseModalProps> = ({
 
           {/* Kategori Seçimi */}
           <div>
-            <label className="block text-xs font-semibold text-zinc-600 mb-1.5">
+            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">
               Kategori *
             </label>
-            <div className="grid grid-cols-3 gap-1.5 max-h-32 overflow-y-auto p-1 border border-zinc-200 rounded-xl bg-zinc-50/50">
+            <div className="grid grid-cols-3 gap-1.5 max-h-32 overflow-y-auto p-1 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-950/40">
               {categories.map(cat => {
                 const isSelected = selectedCategory === cat.id;
                 return (
@@ -188,8 +188,8 @@ export const EditFixedExpenseModal: React.FC<EditFixedExpenseModalProps> = ({
                     onClick={() => setSelectedCategory(cat.id)}
                     className={`p-2 rounded-lg text-[11px] font-medium flex flex-col items-center gap-1 transition cursor-pointer border ${
                       isSelected
-                        ? 'bg-white border-emerald-500 text-emerald-900 shadow-xs font-bold ring-1 ring-emerald-400'
-                        : 'bg-white/80 border-zinc-200 text-zinc-600 hover:bg-white'
+                        ? 'bg-white dark:bg-zinc-800 border-emerald-500 text-emerald-900 dark:text-emerald-200 shadow-xs font-bold ring-1 ring-emerald-400'
+                        : 'bg-white/80 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-white dark:hover:bg-zinc-800'
                     }`}
                   >
                     <span className="text-base">{cat.icon}</span>
@@ -202,7 +202,7 @@ export const EditFixedExpenseModal: React.FC<EditFixedExpenseModalProps> = ({
 
           {/* Özel Not */}
           <div>
-            <label className="block text-xs font-semibold text-zinc-600 mb-1">
+            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
               Özel Not (Opsiyonel)
             </label>
             <input
@@ -210,7 +210,7 @@ export const EditFixedExpenseModal: React.FC<EditFixedExpenseModalProps> = ({
               placeholder="Abone no, otomatik ödeme talimatı vb..."
               value={note}
               onChange={e => setNote(e.target.value)}
-              className="w-full px-3 py-2 text-xs border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
             />
           </div>
 

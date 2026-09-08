@@ -79,22 +79,22 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
   const PRESET_ICONS = ['🥖', '💧', '⛽', '☕', '🛒', '🥩', '💊', '🚕', '🍕', '🍰', '🧹', '⚡'];
 
   return (
-    <div className="bg-white rounded-xl border border-zinc-200 shadow-xs overflow-hidden flex flex-col h-full">
+    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xs overflow-hidden flex flex-col h-full transition-colors duration-200">
       
       {/* Kart Başlığı */}
-      <div className="p-4 border-b border-zinc-200 bg-amber-50/40 flex items-center justify-between">
+      <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 bg-amber-50/40 dark:bg-amber-950/20 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center">
-            <Zap className="w-4 h-4 fill-amber-500 text-amber-600" />
+          <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 flex items-center justify-center">
+            <Zap className="w-4 h-4 fill-amber-500 text-amber-600 dark:text-amber-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-zinc-900">Hızlı Harcama Şablonları</h2>
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-100 font-semibold text-amber-900">
+              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">Hızlı Harcama Şablonları</h2>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 font-semibold text-amber-900 dark:text-amber-300">
                 1 Dokunuşla Ekle
               </span>
             </div>
-            <p className="text-xs text-zinc-500 mt-0.5">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
               Rutin harcamalara dokununca anında bugünün harcamalarına ekler
             </p>
           </div>
@@ -102,7 +102,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
 
         <button
           onClick={() => setIsAddingCustom(!isAddingCustom)}
-          className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-white border border-amber-300 text-amber-900 hover:bg-amber-50 transition cursor-pointer shadow-xs"
+          className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition cursor-pointer shadow-xs"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>Şablon Ekle</span>
@@ -111,24 +111,24 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
 
       {/* Yeni Özel Şablon Ekleme Formu */}
       {isAddingCustom && (
-        <form onSubmit={handleSaveCustom} className="p-4 bg-zinc-50 border-b border-zinc-200 space-y-3 text-xs">
-          <div className="font-bold text-zinc-900 text-sm">Yeni Hızlı Harcama Kısayolu Ekle</div>
+        <form onSubmit={handleSaveCustom} className="p-4 bg-zinc-50 dark:bg-zinc-850 border-b border-zinc-200 dark:border-zinc-800 space-y-3 text-xs">
+          <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Yeni Hızlı Harcama Kısayolu Ekle</div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 mb-1">Başlık *</label>
+              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Başlık *</label>
               <input
                 type="text"
                 required
                 placeholder="Örn: Simit & Ayran, Otopark"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                className="w-full px-3 py-2 border border-zinc-300 rounded-lg bg-white text-xs"
+                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 mb-1">Varsayılan Tutar (₺) *</label>
+              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Varsayılan Tutar (₺) *</label>
               <input
                 type="text"
                 inputMode="decimal"
@@ -136,18 +136,18 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
                 placeholder="0"
                 value={amount}
                 onChange={e => setAmount(formatAmountInput(e.target.value))}
-                className="w-full px-3 py-2 border border-zinc-300 rounded-lg bg-white text-xs font-bold"
+                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs font-bold"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 mb-1">Kategori</label>
+              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Kategori</label>
               <select
                 value={categoryId}
                 onChange={e => setCategoryId(e.target.value)}
-                className="w-full px-2 py-2 border border-zinc-300 rounded-lg bg-white text-xs"
+                className="w-full px-2 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs"
               >
                 {settings.categories.map(c => (
                   <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
@@ -156,11 +156,11 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 mb-1">İkon</label>
+              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">İkon</label>
               <select
                 value={icon}
                 onChange={e => setIcon(e.target.value)}
-                className="w-full px-2 py-2 border border-zinc-300 rounded-lg bg-white text-base"
+                className="w-full px-2 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-base"
               >
                 {PRESET_ICONS.map(i => (
                   <option key={i} value={i}>{i}</option>
@@ -169,11 +169,11 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 mb-1">Ödeme Türü</label>
+              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Ödeme Türü</label>
               <select
                 value={paymentMethod}
                 onChange={e => setPaymentMethod(e.target.value as 'kredi_karti' | 'nakit')}
-                className="w-full px-2 py-2 border border-zinc-300 rounded-lg bg-white text-xs"
+                className="w-full px-2 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs"
               >
                 <option value="kredi_karti">💳 Kredi Kartı</option>
                 <option value="nakit">💵 Nakit</option>
@@ -185,7 +185,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
             <button
               type="button"
               onClick={() => setIsAddingCustom(false)}
-              className="px-3 py-1 rounded border border-zinc-300 text-zinc-600 hover:bg-zinc-100 transition cursor-pointer"
+              className="px-3 py-1 rounded border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
             >
               Vazgeç
             </button>
@@ -210,8 +210,8 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
               onClick={() => handleQuickAdd(tpl)}
               className={`p-3 rounded-xl border transition cursor-pointer text-left flex flex-col justify-between group relative overflow-hidden select-none ${
                 isJustAdded
-                  ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-400/40'
-                  : 'border-zinc-200 hover:border-emerald-400 hover:bg-emerald-50/30 bg-white'
+                  ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50 ring-2 ring-emerald-400/40'
+                  : 'border-zinc-200 dark:border-zinc-800 hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 bg-white dark:bg-zinc-900'
               }`}
             >
               {/* Üst Bar: İkon ve İşlemler */}
@@ -231,7 +231,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
                           paymentMethod: tpl.paymentMethod || 'kredi_karti',
                         });
                       }}
-                      className="p-1 rounded text-zinc-300 hover:text-zinc-600 opacity-0 group-hover:opacity-100 transition"
+                      className="p-1 rounded text-zinc-300 dark:text-zinc-600 hover:text-zinc-600 dark:hover:text-zinc-300 opacity-0 group-hover:opacity-100 transition"
                       title="Tutarı değiştirerek aç"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
@@ -242,7 +242,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
                     <button
                       type="button"
                       onClick={(e) => handleDeleteTemplate(tpl.id, e)}
-                      className="p-1 rounded text-zinc-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition"
+                      className="p-1 rounded text-zinc-300 dark:text-zinc-600 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition"
                       title="Şablonu sil"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -253,27 +253,27 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
 
               {/* Orta: Başlık */}
               <div className="mt-2.5">
-                <div className="font-bold text-xs sm:text-sm text-zinc-900 truncate">
+                <div className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 truncate">
                   {tpl.title}
                 </div>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <span className="text-sm sm:text-base font-extrabold text-emerald-600">
+                  <span className="text-sm sm:text-base font-extrabold text-emerald-600 dark:text-emerald-400">
                     {tpl.amount.toLocaleString('tr-TR')} ₺
                   </span>
-                  <span className="text-[10px] text-zinc-400">
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
                     {tpl.paymentMethod === 'nakit' ? '💵 Nakit' : '💳 Kart'}
                   </span>
                 </div>
               </div>
 
               {/* Alt: Hızlı Ekle İpucu veya Onay Rozeti */}
-              <div className="mt-2 pt-2 border-t border-zinc-100 flex items-center justify-between text-[10px]">
+              <div className="mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[10px]">
                 {isJustAdded ? (
-                  <span className="text-emerald-700 font-bold flex items-center gap-1">
+                  <span className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
                     <Check className="w-3 h-3" /> Eklendi!
                   </span>
                 ) : (
-                  <span className="text-zinc-400 group-hover:text-emerald-600 font-medium transition flex items-center gap-1">
+                  <span className="text-zinc-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 font-medium transition flex items-center gap-1">
                     <Plus className="w-3 h-3" /> Dokun ve Ekle
                   </span>
                 )}

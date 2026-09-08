@@ -287,7 +287,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-100 text-zinc-900 pb-24 sm:pb-12">
+    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 pb-24 sm:pb-12 transition-colors duration-200">
       
       {/* Üst Çubuk & Menü */}
       <Header
@@ -330,18 +330,18 @@ export default function Home() {
         {currentView === 'accounting' && (
           <div className="space-y-4 sm:space-y-5">
             
-            {/* Hızlı Filtre Paneli */}
-            <div className="bg-white rounded-xl border border-zinc-200 p-2.5 sm:p-3.5 shadow-xs flex items-center justify-between overflow-hidden">
+            {/* Hızlı Kişi Filtresi */}
+            <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-2.5 sm:p-3.5 shadow-xs flex items-center justify-between overflow-hidden">
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 w-full sm:w-auto">
-                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
-                  <Users className="w-3.5 h-3.5 text-zinc-400" /> Kişi:
+                <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
+                  <Users className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" /> Kişi:
                 </span>
                 <button
                   onClick={() => setSelectedPersonId('all')}
                   className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer shrink-0 ${
                     selectedPersonId === 'all'
                       ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                   }`}
                 >
                   Tümü
@@ -353,7 +353,7 @@ export default function Home() {
                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shrink-0 ${
                       selectedPersonId === p.id
                         ? 'bg-emerald-600 text-white shadow-xs'
-                        : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                     }`}
                   >
                     <span>{p.avatar}</span>
@@ -362,7 +362,7 @@ export default function Home() {
                 ))}
               </div>
 
-              <span className="text-[11px] text-zinc-400 font-medium hidden lg:inline shrink-0">
+              <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-medium hidden lg:inline shrink-0">
                 Sola dokunarak hızlı ekleyin, sağdan tüm dökümü filtreleyin
               </span>
             </div>
@@ -412,17 +412,17 @@ export default function Home() {
           <div className="space-y-5">
             
             {/* Hızlı Kişi Filtresi */}
-            <div className="bg-white rounded-xl border border-zinc-200 p-2.5 sm:p-3.5 shadow-xs flex items-center justify-between overflow-hidden">
+            <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-2.5 sm:p-3.5 shadow-xs flex items-center justify-between overflow-hidden">
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 w-full sm:w-auto">
-                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
-                  <Users className="w-3.5 h-3.5 text-zinc-400" /> Kişi:
+                <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
+                  <Users className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" /> Kişi:
                 </span>
                 <button
                   onClick={() => setSelectedPersonId('all')}
                   className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer shrink-0 ${
                     selectedPersonId === 'all'
                       ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                   }`}
                 >
                   Tümü
@@ -434,7 +434,7 @@ export default function Home() {
                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shrink-0 ${
                       selectedPersonId === p.id
                         ? 'bg-emerald-600 text-white shadow-xs'
-                        : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                     }`}
                   >
                     <span>{p.avatar}</span>
@@ -443,7 +443,7 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="text-xs text-zinc-400 font-medium hidden lg:inline shrink-0">
+              <div className="text-xs text-zinc-400 dark:text-zinc-500 font-medium hidden lg:inline shrink-0">
                 Bu ayki faturalarınızı tikleyin veya şablonlarınızı yönetin.
               </div>
             </div>
@@ -485,17 +485,17 @@ export default function Home() {
           <div className="space-y-5">
             
             {/* Hızlı Kişi Filtresi */}
-            <div className="bg-white rounded-xl border border-zinc-200 p-2.5 sm:p-3.5 shadow-xs flex items-center justify-between overflow-hidden">
+            <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-2.5 sm:p-3.5 shadow-xs flex items-center justify-between overflow-hidden">
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 w-full sm:w-auto">
-                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
-                  <Users className="w-3.5 h-3.5 text-zinc-400" /> Kişi:
+                <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
+                  <Users className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" /> Kişi:
                 </span>
                 <button
                   onClick={() => setSelectedPersonId('all')}
                   className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer shrink-0 ${
                     selectedPersonId === 'all'
                       ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                   }`}
                 >
                   Tümü
@@ -507,7 +507,7 @@ export default function Home() {
                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shrink-0 ${
                       selectedPersonId === p.id
                         ? 'bg-emerald-600 text-white shadow-xs'
-                        : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                     }`}
                   >
                     <span>{p.avatar}</span>
@@ -516,7 +516,7 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="text-xs text-zinc-400 font-medium hidden lg:inline shrink-0">
+              <div className="text-xs text-zinc-400 dark:text-zinc-500 font-medium hidden lg:inline shrink-0">
                 Gelirlerinizi kaydedin ve aylık tavan bütçenizi kontrol edin.
               </div>
             </div>
@@ -554,11 +554,11 @@ export default function Home() {
       </main>
 
       {/* Mobil İçin Alt Gezinti Çubuğu (Bottom Navigation Bar - 4 Sekme + Ortada +) */}
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-zinc-200 px-3 py-1.5 flex items-center justify-between shadow-lg pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))]">
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 px-3 py-1.5 flex items-center justify-between shadow-lg pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] transition-colors duration-200">
         <button
           onClick={() => setCurrentView('dashboard')}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition cursor-pointer flex-1 ${
-            currentView === 'dashboard' ? 'text-emerald-600 font-bold' : 'text-zinc-500'
+            currentView === 'dashboard' ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-zinc-500 dark:text-zinc-400'
           }`}
         >
           <LayoutDashboard className="w-4 h-4" />
@@ -568,7 +568,7 @@ export default function Home() {
         <button
           onClick={() => setCurrentView('accounting')}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition cursor-pointer flex-1 ${
-            currentView === 'accounting' ? 'text-emerald-600 font-bold' : 'text-zinc-500'
+            currentView === 'accounting' ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-zinc-500 dark:text-zinc-400'
           }`}
         >
           <ReceiptText className="w-4 h-4" />
@@ -580,7 +580,7 @@ export default function Home() {
             setPresetExpense(null);
             setIsAddExpenseOpen(true);
           }}
-          className="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-md flex items-center justify-center transition active:scale-95 cursor-pointer -mt-4 border-2 border-white shrink-0 mx-1"
+          className="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-md flex items-center justify-center transition active:scale-95 cursor-pointer -mt-4 border-2 border-white dark:border-zinc-900 shrink-0 mx-1"
           aria-label="Harcama Ekle"
         >
           <Plus className="w-5 h-5 stroke-[2.5]" />
@@ -589,7 +589,7 @@ export default function Home() {
         <button
           onClick={() => setCurrentView('bills')}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition cursor-pointer flex-1 ${
-            currentView === 'bills' ? 'text-emerald-600 font-bold' : 'text-zinc-500'
+            currentView === 'bills' ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-zinc-500 dark:text-zinc-400'
           }`}
         >
           <CalendarCheck className="w-4 h-4" />
@@ -599,7 +599,7 @@ export default function Home() {
         <button
           onClick={() => setCurrentView('budget')}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition cursor-pointer flex-1 ${
-            currentView === 'budget' ? 'text-emerald-600 font-bold' : 'text-zinc-500'
+            currentView === 'budget' ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-zinc-500 dark:text-zinc-400'
           }`}
         >
           <Target className="w-4 h-4" />

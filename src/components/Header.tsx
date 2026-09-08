@@ -13,7 +13,10 @@ import {
   ReceiptText,
   CalendarCheck,
   Target,
+  Sun,
+  Moon,
 } from 'lucide-react';
+import { toggleTheme, isDarkModeActive } from '@/lib/theme';
 
 export type AppView = 'dashboard' | 'accounting' | 'bills' | 'budget';
 
@@ -51,8 +54,19 @@ export const Header: React.FC<HeaderProps> = ({
     onMonthChange(`${y}-${m}`);
   };
 
+  const [isDark, setIsDark] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsDark(isDarkModeActive());
+  }, []);
+
+  const handleToggleTheme = () => {
+    const next = toggleTheme();
+    setIsDark(next === 'dark');
+  };
+
   return (
-    <header className="bg-white border-b border-zinc-200 sticky top-0 z-30 shadow-xs">
+    <header className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-30 shadow-xs transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-2">
         
         {/* Sol: Logo & Bulut Durumu */}
@@ -61,14 +75,14 @@ export const Header: React.FC<HeaderProps> = ({
             ₺
           </div>
           <div>
-            <h1 className="text-sm sm:text-base font-bold text-zinc-900 leading-tight">Ev Muhasebesi</h1>
-            <div className="flex items-center gap-1 text-[10px] text-zinc-400">
+            <h1 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 leading-tight">Ev Muhasebesi</h1>
+            <div className="flex items-center gap-1 text-[10px] text-zinc-400 dark:text-zinc-500">
               {isCloudConnected ? (
-                <span className="flex items-center gap-0.5 text-emerald-600 font-medium">
+                <span className="flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-medium">
                   <Cloud className="w-3 h-3" /> Bulut
                 </span>
               ) : (
-                <span className="flex items-center gap-0.5 text-zinc-400">
+                <span className="flex items-center gap-0.5 text-zinc-400 dark:text-zinc-500">
                   <CloudOff className="w-3 h-3" /> Yerel
                 </span>
               )}
@@ -77,16 +91,16 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Orta: YALNIZCA Masaüstünde Sayfa Geçiş Sekmeleri (Mobilde zaten altta var) */}
-        <nav className="hidden md:flex items-center bg-zinc-100 p-1 rounded-xl border border-zinc-200">
+        <nav className="hidden md:flex items-center bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl border border-zinc-200 dark:border-zinc-700">
           <button
             onClick={() => onViewChange('dashboard')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
               activeView === 'dashboard'
-                ? 'bg-white text-emerald-700 shadow-xs'
-                : 'text-zinc-600 hover:text-zinc-900'
+                ? 'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
-            <LayoutDashboard className="w-3.5 h-3.5 text-emerald-600" />
+            <LayoutDashboard className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>Anasayfa</span>
           </button>
 
@@ -94,11 +108,11 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onViewChange('accounting')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
               activeView === 'accounting'
-                ? 'bg-white text-emerald-700 shadow-xs'
-                : 'text-zinc-600 hover:text-zinc-900'
+                ? 'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
-            <ReceiptText className="w-3.5 h-3.5 text-emerald-600" />
+            <ReceiptText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>Muhasebe</span>
           </button>
 
@@ -106,11 +120,11 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onViewChange('bills')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
               activeView === 'bills'
-                ? 'bg-white text-emerald-700 shadow-xs'
-                : 'text-zinc-600 hover:text-zinc-900'
+                ? 'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
-            <CalendarCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <CalendarCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>Faturalar</span>
           </button>
 
@@ -118,11 +132,11 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onViewChange('budget')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
               activeView === 'budget'
-                ? 'bg-white text-emerald-700 shadow-xs'
-                : 'text-zinc-600 hover:text-zinc-900'
+                ? 'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white'
             }`}
           >
-            <Target className="w-3.5 h-3.5 text-emerald-600" />
+            <Target className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>Bütçe</span>
           </button>
         </nav>
@@ -130,30 +144,30 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Sağ: Ay Seçici & Aksiyon Butonları */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Ay Değiştirici */}
-          <div className="flex items-center bg-zinc-100 rounded-lg p-0.5 sm:p-1 border border-zinc-200">
+          <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 rounded-lg p-0.5 sm:p-1 border border-zinc-200 dark:border-zinc-700">
             <button
               onClick={handlePrevMonth}
               aria-label="Önceki Ay"
-              className="p-1 sm:p-1.5 rounded-md hover:bg-white text-zinc-700 transition cursor-pointer"
+              className="p-1 sm:p-1.5 rounded-md hover:bg-white dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition cursor-pointer"
             >
               <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
 
-            <span className="px-1.5 sm:px-2.5 text-xs sm:text-sm font-semibold text-zinc-800 min-w-[75px] sm:min-w-[100px] text-center select-none">
+            <span className="px-1.5 sm:px-2.5 text-xs sm:text-sm font-semibold text-zinc-800 dark:text-zinc-200 min-w-[75px] sm:min-w-[100px] text-center select-none">
               {formatMonthDisplay(currentMonth)}
             </span>
 
             <button
               onClick={handleNextMonth}
               aria-label="Sonraki Ay"
-              className="p-1 sm:p-1.5 rounded-md hover:bg-white text-zinc-700 transition cursor-pointer"
+              className="p-1 sm:p-1.5 rounded-md hover:bg-white dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition cursor-pointer"
             >
               <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
 
             <button
               onClick={handleCurrentMonth}
-              className="hidden lg:inline-block ml-1 text-xs px-2 py-0.5 text-emerald-700 hover:bg-white rounded font-medium transition cursor-pointer"
+              className="hidden lg:inline-block ml-1 text-xs px-2 py-0.5 text-emerald-700 dark:text-emerald-400 hover:bg-white dark:hover:bg-zinc-700 rounded font-medium transition cursor-pointer"
             >
               Bu Ay
             </button>
@@ -163,19 +177,33 @@ export const Header: React.FC<HeaderProps> = ({
           {activeView === 'dashboard' && (
             <button
               onClick={onExportExcel}
-              className="p-1.5 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium text-zinc-700 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition cursor-pointer border border-zinc-200"
+              className="inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 sm:px-3 text-xs sm:text-sm font-medium text-zinc-700 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition cursor-pointer border border-zinc-200 dark:border-zinc-700 whitespace-nowrap"
               title="Bu ayın dökümünü Excel dosyası olarak indir"
             >
-              <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-600" />
-              <span className="hidden sm:inline sm:ml-1.5">Excel</span>
+              <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-600 dark:text-zinc-300 shrink-0" />
+              <span className="hidden sm:inline">Excel</span>
             </button>
           )}
+
+          {/* Tema Değiştirici (Koyu / Açık Mod) */}
+          <button
+            onClick={handleToggleTheme}
+            aria-label={isDark ? "Açık Moda Geç" : "Koyu Moda Geç"}
+            title={isDark ? "Açık Moda Geç" : "Koyu Moda Geç"}
+            className="p-1.5 sm:p-2 text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition cursor-pointer border border-transparent hover:border-zinc-200 dark:hover:border-zinc-700"
+          >
+            {isDark ? (
+              <Sun className="w-4 h-4 text-amber-400" />
+            ) : (
+              <Moon className="w-4 h-4 text-zinc-600" />
+            )}
+          </button>
 
           {/* Ayarlar Butonu */}
           <button
             onClick={onOpenSettings}
             aria-label="Ayarlar"
-            className="p-1.5 sm:p-2 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 rounded-lg transition cursor-pointer border border-transparent hover:border-zinc-200"
+            className="p-1.5 sm:p-2 text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition cursor-pointer border border-transparent hover:border-zinc-200 dark:hover:border-zinc-700"
           >
             <Settings className="w-4 h-4" />
           </button>

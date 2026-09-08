@@ -61,20 +61,20 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl border border-zinc-200 shadow-xs overflow-hidden flex flex-col h-full">
+    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xs overflow-hidden flex flex-col h-full transition-colors duration-200">
       
       {/* Kart Başlığı ve Arama / Filtreler */}
-      <div className="p-4 border-b border-zinc-200 bg-zinc-50/50 space-y-3">
+      <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 space-y-3">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-zinc-900">Günlük & Değişken Harcamalar</h2>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-200 font-semibold text-zinc-700">
+              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">Günlük & Değişken Harcamalar</h2>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-700 font-semibold text-zinc-700 dark:text-zinc-200">
                 {filtered.length} kayıt
               </span>
             </div>
-            <p className="text-xs text-zinc-500 mt-0.5">
-              Toplam Harcama: <strong className="text-zinc-800">{totalFiltered.toLocaleString('tr-TR')} ₺</strong>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+              Toplam Harcama: <strong className="text-zinc-800 dark:text-zinc-200">{totalFiltered.toLocaleString('tr-TR')} ₺</strong>
             </p>
           </div>
 
@@ -89,13 +89,13 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
         {/* Arama, Kategori ve Ödeme Yöntemi Filtresi */}
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400" />
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
             <input
               type="text"
               placeholder="Harcama ara (Migros, benzin, eczane...)"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
           </div>
 
@@ -103,7 +103,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
             <select
               value={selectedCategory}
               onChange={e => setSelectedCategory(e.target.value)}
-              className="w-full sm:w-auto px-2 py-1.5 text-xs bg-white border border-zinc-300 rounded-lg text-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 truncate"
+              className="w-full sm:w-auto px-2 py-1.5 text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 truncate"
             >
               <option value="all">Tüm Kategoriler</option>
               {categories.map(c => (
@@ -114,7 +114,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
             <select
               value={paymentFilter}
               onChange={e => setPaymentFilter(e.target.value as 'all' | 'kredi_karti' | 'nakit')}
-              className="w-full sm:w-auto px-2 py-1.5 text-xs bg-white border border-zinc-300 rounded-lg text-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 truncate"
+              className="w-full sm:w-auto px-2 py-1.5 text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 truncate"
             >
               <option value="all">💳/💵 Tümü</option>
               <option value="kredi_karti">💳 Kredi Kartı</option>
@@ -125,16 +125,16 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
       </div>
 
       {/* Liste */}
-      <div className="divide-y divide-zinc-100 overflow-y-auto max-h-[480px] p-1 flex-1">
+      <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60 overflow-y-auto max-h-[480px] p-1 flex-1">
         {filtered.length === 0 ? (
           <div className="py-12 text-center">
-            <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center mx-auto text-zinc-400 mb-2">
+            <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400 dark:text-zinc-500 mb-2">
               <ShoppingBag className="w-5 h-5" />
             </div>
-            <p className="text-xs text-zinc-500 font-medium">Bu kriterde harcama bulunamadı.</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Bu kriterde harcama bulunamadı.</p>
             <button
               onClick={onOpenAddExpense}
-              className="mt-2 text-xs font-semibold text-emerald-600 hover:underline cursor-pointer"
+              className="mt-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
             >
               Hemen yeni bir harcama ekle
             </button>
@@ -147,28 +147,28 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
             return (
               <div
                 key={expense.id}
-                className="p-3 rounded-lg flex items-center justify-between gap-3 hover:bg-zinc-50 transition group"
+                className="p-3 rounded-lg flex items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition group"
               >
                 {/* Sol: İkon + Başlık + Kişi + Tarih */}
                 <div className="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-zinc-100 flex items-center justify-center text-sm sm:text-base shrink-0 mt-0.5 sm:mt-0">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-sm sm:text-base shrink-0 mt-0.5 sm:mt-0">
                     {category?.icon || '🛒'}
                   </div>
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-xs sm:text-sm font-semibold text-zinc-900 truncate">
+                      <span className="text-xs sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
                         {expense.title}
                       </span>
                       {expense.note && (
-                        <span className="text-[11px] text-zinc-400 truncate max-w-[100px]" title={expense.note}>
+                        <span className="text-[11px] text-zinc-400 dark:text-zinc-500 truncate max-w-[100px]" title={expense.note}>
                           ({expense.note})
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-zinc-500 flex-wrap">
-                      <span className="font-medium text-zinc-600">
+                    <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400 flex-wrap">
+                      <span className="font-medium text-zinc-600 dark:text-zinc-300">
                         {formatDateLabel(expense.date)}
                       </span>
                       <span>•</span>
@@ -179,19 +179,19 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
                         </span>
                       )}
                       <span>•</span>
-                      <span className="text-zinc-500">
+                      <span className="text-zinc-500 dark:text-zinc-400">
                         {category?.name || 'Diğer'}
                       </span>
                       {expense.paymentMethod && (
                         <>
                           <span>•</span>
-                          <span className="inline-flex items-center gap-0.5 text-zinc-400">
+                          <span className="inline-flex items-center gap-0.5 text-zinc-400 dark:text-zinc-500">
                             {expense.paymentMethod === 'kredi_karti' ? (
-                              <span className="flex items-center gap-0.5 text-indigo-600 bg-indigo-50 px-1 rounded text-[10px] font-medium">
+                              <span className="flex items-center gap-0.5 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-1 rounded text-[10px] font-medium">
                                 <CreditCard className="w-3 h-3" /> Kart
                               </span>
                             ) : (
-                              <span className="flex items-center gap-0.5 text-emerald-600 bg-emerald-50 px-1 rounded text-[10px] font-medium">
+                              <span className="flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-1 rounded text-[10px] font-medium">
                                 <Banknote className="w-3 h-3" /> Nakit
                               </span>
                             )}
@@ -204,14 +204,14 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
 
                 {/* Sağ: Tutar + Düzenle & Sil butonları */}
                 <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-1">
-                  <span className="text-xs sm:text-sm font-bold text-zinc-900">
+                  <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">
                     {Number(expense.amount).toLocaleString('tr-TR')} ₺
                   </span>
 
                   <div className="flex items-center gap-0.5">
                     <button
                       onClick={() => onEditExpense(expense)}
-                      className="text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 p-1 rounded-md transition cursor-pointer"
+                      className="text-zinc-400 dark:text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 p-1 rounded-md transition cursor-pointer"
                       title="Harcamayı düzenle"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -219,7 +219,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
 
                     <button
                       onClick={() => onDeleteExpense(expense.id)}
-                      className="text-zinc-300 hover:text-rose-500 hover:bg-rose-50 p-1 rounded-md transition cursor-pointer"
+                      className="text-zinc-300 dark:text-zinc-600 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 p-1 rounded-md transition cursor-pointer"
                       title="Harcamayı sil"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

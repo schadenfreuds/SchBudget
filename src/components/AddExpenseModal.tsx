@@ -78,15 +78,15 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
-      <div className="bg-white rounded-2xl max-w-md w-full shadow-xl border border-zinc-200 overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full shadow-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden flex flex-col max-h-[92vh]">
         
         {/* Üst Bar */}
-        <div className="px-5 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50">
-          <h3 className="font-bold text-base text-zinc-900">Harcama Ekle</h3>
+        <div className="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-zinc-800/50">
+          <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100">Harcama Ekle</h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200 transition cursor-pointer"
+            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -96,7 +96,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
           
           {/* Tutar Girişi (Büyük ve Net) */}
           <div>
-            <label className="block text-xs font-semibold text-zinc-600 mb-1">
+            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
               Tutar (₺) *
             </label>
             <div className="relative">
@@ -108,9 +108,9 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
                 placeholder="0"
                 value={amount}
                 onChange={e => setAmount(formatAmountInput(e.target.value))}
-                className="w-full px-3.5 py-2.5 text-2xl font-bold text-zinc-900 border-2 border-emerald-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400/20"
+                className="w-full px-3.5 py-2.5 text-2xl font-bold text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-900 border-2 border-emerald-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400/20"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl font-bold text-zinc-400">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl font-bold text-zinc-400 dark:text-zinc-500">
                 ₺
               </span>
             </div>
@@ -118,7 +118,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
 
           {/* Harcayan Kişi (Anne, Baba, Çocuk, Ortak) */}
           <div>
-            <label className="block text-xs font-semibold text-zinc-600 mb-1.5">
+            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">
               Harcamayı Yapan Kişi *
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -131,15 +131,15 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
                     onClick={() => setSelectedPerson(person.id)}
                     className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between border transition cursor-pointer ${
                       isSelected
-                        ? 'border-emerald-600 bg-emerald-50 text-emerald-900 ring-1 ring-emerald-500'
-                        : 'border-zinc-200 text-zinc-700 hover:bg-zinc-50'
+                        ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 ring-1 ring-emerald-500'
+                        : 'border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800'
                     }`}
                   >
                     <div className="flex items-center gap-1.5">
                       <span className="text-base">{person.avatar}</span>
                       <span>{person.name}</span>
                     </div>
-                    {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600" />}
+                    {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />}
                   </button>
                 );
               })}
@@ -148,10 +148,10 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
 
           {/* Kategori Seçimi */}
           <div>
-            <label className="block text-xs font-semibold text-zinc-600 mb-1.5">
+            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">
               Kategori *
             </label>
-            <div className="grid grid-cols-3 gap-1.5 max-h-36 overflow-y-auto p-1 border border-zinc-200 rounded-xl bg-zinc-50/50">
+            <div className="grid grid-cols-3 gap-1.5 max-h-36 overflow-y-auto p-1 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-950/40">
               {categories.map(cat => {
                 const isSelected = selectedCategory === cat.id;
                 return (
@@ -161,8 +161,8 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
                     onClick={() => setSelectedCategory(cat.id)}
                     className={`p-2 rounded-lg text-[11px] font-medium flex flex-col items-center gap-1 transition cursor-pointer border ${
                       isSelected
-                        ? 'bg-white border-emerald-500 text-emerald-900 shadow-xs font-bold ring-1 ring-emerald-400'
-                        : 'bg-white/80 border-zinc-200 text-zinc-600 hover:bg-white'
+                        ? 'bg-white dark:bg-zinc-800 border-emerald-500 text-emerald-900 dark:text-emerald-200 shadow-xs font-bold ring-1 ring-emerald-400'
+                        : 'bg-white/80 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-white dark:hover:bg-zinc-800'
                     }`}
                   >
                     <span className="text-base">{cat.icon}</span>
@@ -175,7 +175,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
 
           {/* Harcama Başlığı / Açıklama */}
           <div>
-            <label className="block text-xs font-semibold text-zinc-600 mb-1">
+            <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
               Açıklama / Yer (Opsiyonel)
             </label>
             <input
@@ -183,36 +183,36 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
               placeholder="Örn: Migros haftalık alışveriş, Eczane vitamin..."
               value={title}
               onChange={e => setTitle(e.target.value)}
-              className="w-full px-3 py-2 text-xs border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
             />
           </div>
 
           {/* Tarih ve Ödeme Yöntemi */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-zinc-600 mb-1">
+              <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
                 Tarih
               </label>
               <input
                 type="date"
                 value={date}
                 onChange={e => setDate(e.target.value)}
-                className="w-full px-2.5 py-1.5 text-xs border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                className="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-zinc-600 mb-1">
+              <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
                 Ödeme Yöntemi
               </label>
-              <div className="flex rounded-lg border border-zinc-300 p-0.5 bg-zinc-100">
+              <div className="flex rounded-lg border border-zinc-300 dark:border-zinc-700 p-0.5 bg-zinc-100 dark:bg-zinc-800">
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('kredi_karti')}
                   className={`flex-1 py-1 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 transition cursor-pointer ${
                     paymentMethod === 'kredi_karti'
-                      ? 'bg-white text-zinc-800 shadow-xs'
-                      : 'text-zinc-500 hover:text-zinc-800'
+                      ? 'bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200'
                   }`}
                 >
                   <CreditCard className="w-3 h-3" /> Kart
@@ -222,8 +222,8 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
                   onClick={() => setPaymentMethod('nakit')}
                   className={`flex-1 py-1 text-[11px] font-semibold rounded-md flex items-center justify-center gap-1 transition cursor-pointer ${
                     paymentMethod === 'nakit'
-                      ? 'bg-white text-zinc-800 shadow-xs'
-                      : 'text-zinc-500 hover:text-zinc-800'
+                      ? 'bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200'
                   }`}
                 >
                   <Banknote className="w-3 h-3" /> Nakit
