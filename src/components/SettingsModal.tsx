@@ -314,17 +314,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   />
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-                  <div className="flex items-center gap-1">
-                    <span className="text-[11px] text-zinc-500 mr-1">İkon:</span>
-                    {AVATAR_OPTIONS.slice(0, 8).map(emoji => (
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-xs font-medium text-zinc-600 mr-1">İkon:</span>
+                    {AVATAR_OPTIONS.map(emoji => (
                       <button
                         key={emoji}
                         type="button"
                         onClick={() => setNewPersonAvatar(emoji)}
-                        className={`w-7 h-7 rounded-lg text-sm flex items-center justify-center transition cursor-pointer ${
-                          newPersonAvatar === emoji ? 'bg-emerald-100 ring-2 ring-emerald-500' : 'bg-white hover:bg-zinc-100 border border-zinc-200'
+                        className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center transition active:scale-95 cursor-pointer ${
+                          newPersonAvatar === emoji
+                            ? 'bg-emerald-100 ring-2 ring-emerald-500 scale-105 shadow-xs'
+                            : 'bg-white hover:bg-zinc-100 border border-zinc-200'
                         }`}
+                        title={emoji}
                       >
                         {emoji}
                       </button>
@@ -333,24 +336,33 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition cursor-pointer shrink-0 ml-auto"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition cursor-pointer shrink-0 ml-auto"
                   >
-                    <Plus className="w-3.5 h-3.5" /> Ekle
+                    <Plus className="w-4 h-4" /> Ekle
                   </button>
                 </div>
               </form>
 
               {/* Kişi Listesi */}
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 gap-2.5">
                 {persons.map(p => (
                   <div
                     key={p.id}
-                    className="p-3 rounded-xl border border-zinc-200 flex items-center justify-between gap-2 bg-white hover:border-zinc-300 transition"
+                    className="p-3.5 rounded-xl border border-zinc-200 flex items-center justify-between gap-3 bg-white hover:border-zinc-300 transition"
                   >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <span className={`w-9 h-9 rounded-xl flex items-center justify-center text-xl shrink-0 border ${p.color || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}>
+                    <div className="flex items-center gap-3.5 flex-1 min-w-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentIndex = AVATAR_OPTIONS.indexOf(p.avatar);
+                          const nextEmoji = AVATAR_OPTIONS[(currentIndex + 1) % AVATAR_OPTIONS.length] || '🧑';
+                          handleUpdatePerson(p.id, 'avatar', nextEmoji);
+                        }}
+                        title="İkonu değiştirmek için tıkla"
+                        className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 border transition hover:scale-105 active:scale-95 cursor-pointer ${p.color || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}
+                      >
                         {p.avatar}
-                      </span>
+                      </button>
                       <div className="flex-1 min-w-0 space-y-1">
                         <input
                           type="text"
