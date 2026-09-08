@@ -35,7 +35,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [persons, setPersons] = useState<Person[]>(settings.persons || []);
   const [newPersonName, setNewPersonName] = useState('');
   const [newPersonRole, setNewPersonRole] = useState('');
-  const [newPersonAvatar, setNewPersonAvatar] = useState('🧑');
+  const [newPersonAvatar, setNewPersonAvatar] = useState('👩');
   const [newPersonColor, setNewPersonColor] = useState('bg-indigo-100 text-indigo-700 border-indigo-200');
 
   const COLOR_OPTIONS = [
@@ -48,7 +48,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     { label: 'Camgöbeği', value: 'bg-teal-100 text-teal-700 border-teal-200' },
   ];
 
-  const AVATAR_OPTIONS = ['👩', '👨', '🧒', '👦', '👧', '👵', '🧓', '🧑', '🐱', '🐶', '🏠'];
+  const AVATAR_OPTIONS = ['👩', '👨', '🧒', '🐱', '🐶', '🏠'];
 
   const handleAddPerson = (e: React.FormEvent) => {
     e.preventDefault();
@@ -355,7 +355,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         type="button"
                         onClick={() => {
                           const currentIndex = AVATAR_OPTIONS.indexOf(p.avatar);
-                          const nextEmoji = AVATAR_OPTIONS[(currentIndex + 1) % AVATAR_OPTIONS.length] || '🧑';
+                          const nextEmoji = AVATAR_OPTIONS[(currentIndex + 1) % AVATAR_OPTIONS.length] || '👩';
                           handleUpdatePerson(p.id, 'avatar', nextEmoji);
                         }}
                         title="İkonu değiştirmek için tıkla"
