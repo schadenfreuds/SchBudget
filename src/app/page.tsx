@@ -19,10 +19,11 @@ import { SummaryCards } from '@/components/SummaryCards';
 import { FixedExpensesCard } from '@/components/FixedExpensesCard';
 import { VariableExpensesCard } from '@/components/VariableExpensesCard';
 import { CategoryBreakdown } from '@/components/CategoryBreakdown';
+import { IncomesCard } from '@/components/IncomesCard';
 import { AddExpenseModal } from '@/components/AddExpenseModal';
 import { AddIncomeModal } from '@/components/AddIncomeModal';
 import { SettingsModal } from '@/components/SettingsModal';
-import { Plus } from 'lucide-react';
+import { Plus, LayoutDashboard, ReceiptText, TrendingUp, Users } from 'lucide-react';
 
 export default function Home() {
   const [currentMonth, setCurrentMonth] = useState<string>(() => getMonthKey());
@@ -30,26 +31,27 @@ export default function Home() {
   const [budget, setBudget] = useState<MonthlyBudget | null>(null);
   const [selectedPersonId, setSelectedPersonId] = useState<PersonId | 'all'>('all');
   const [isCloudConnected, setIsCloudConnected] = useState<boolean>(false);
+  const [currentView, setCurrentView] = useState<'dashboard' | 'accounting'>('dashboard');
 
   // Modallar
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState<boolean>(false);
   const [isAddIncomeOpen, setIsAddIncomeOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
-  // İlk yükleme ve ay verisi çekme
+  // Ilk yukleme ve ay verisi cekme
   const fetchMonthData = useCallback(async (monthKey: string) => {
     const data = await loadMonthWithCloud(monthKey);
     setBudget(data);
   }, []);
 
   useEffect(() => {
-    // Bulut bağlantı kontrolü
+    // Bulut baglanti kontrolu
     const db = initFirebase();
     setIsCloudConnected(!!db);
 
     fetchMonthData(currentMonth);
 
-    // Eğer Firebase aktifse canlı dinle
+    // Eger Firebase aktifse canli dinle
     const unsubscribe = subscribeToMonth(currentMonth, (updated) => {
       setBudget(updated);
       saveLocalMonth(updated);
@@ -60,7 +62,7 @@ export default function Home() {
     };
   }, [currentMonth, fetchMonthData]);
 
-  // Kaydetme yardımcı fonksiyonu
+  // Kaydetme yardimci fonksiyonu
   const updateBudget = (updater: (prev: MonthlyBudget) => MonthlyBudget) => {
     if (!budget) return;
     const newBudget = updater(budget);
@@ -68,7 +70,7 @@ export default function Home() {
     saveMonthWithCloud(newBudget);
   };
 
-  // 1. Sabit Gider Ödendi / Bekliyor Değiştir
+  // 1. Sabit Gider Odendi / Bekliyor Degistir
   const handleTogglePaid = (id: string) => {
     updateBudget(prev => ({
       ...prev,
@@ -78,7 +80,7 @@ export default function Home() {
     }));
   };
 
-  // 2. Sabit Gider Tutarını Güncelle
+  // 2. Sabit Gider Tutarini Guncelle
   const handleUpdateFixedAmount = (id: string, newAmount: number) => {
     updateBudget(prev => ({
       ...prev,
@@ -109,7 +111,7 @@ export default function Home() {
     }));
   };
 
-  // 5. Değişken Harcama Ekle
+  // 5. Degisken Harcama Ekle
   const handleAddExpense = (expense: Omit<ExpenseItem, 'id' | 'createdAt'>) => {
     const newItem: ExpenseItem = {
       ...expense,
@@ -122,7 +124,7 @@ export default function Home() {
     }));
   };
 
-  // 6. Değişken Harcama Sil
+  // 6. Degisken Harcama Sil
   const handleDeleteExpense = (id: string) => {
     updateBudget(prev => ({
       ...prev,
@@ -142,13 +144,21 @@ export default function Home() {
     }));
   };
 
-  // 8. Excel İndir
+  // 7.5 Gelir Sil
+  const handleDeleteIncome = (id: string) => {
+    updateBudget(prev => ({
+      ...prev,
+      incomes: prev.incomes.filter(i => i.id !== id),
+    }));
+  };
+
+  // 8. Excel Indir
   const handleExportExcel = () => {
     if (!budget) return;
     exportBudgetToExcel(budget, settings);
   };
 
-  // 8.5 Örnek Demo Verisi Yükle
+  // 8.5 Ornek Demo Verisi Yukle
   const handleLoadMockup = () => {
     if (confirm('Mevcut aya 1 aylık gerçekçi örnek bütçe ve harcama verileri yüklensin mi?')) {
       const mock = getMockupMonthBudget(currentMonth);
@@ -157,13 +167,13 @@ export default function Home() {
     }
   };
 
-  // 9. Ayarları Kaydet
+  // 9. Ayarlari Kaydet
   const handleSaveSettings = (newSettings: AppSettings) => {
     setSettingsState(newSettings);
     saveSettings(newSettings);
   };
 
-  // 10. Firebase Bağlantısı
+  // 10. Firebase Baglantisi
   const handleConnectFirebase = (configStr: string) => {
     try {
       const parsed = JSON.parse(configStr);
@@ -190,12 +200,14 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100 text-zinc-900 pb-20 sm:pb-12">
+    <div className="min-h-screen bg-zinc-100 text-zinc-900 pb-24 sm:pb-12">
       
-      {/* Üst Çubuk & Menü */}
+      {/* Ust Cubuk & Menu */}
       <Header
         currentMonth={currentMonth}
         onMonthChange={setCurrentMonth}
+        activeView={currentView}
+        onViewChange={setCurrentView}
         onOpenAddExpense={() => setIsAddExpenseOpen(true)}
         onOpenAddIncome={() => setIsAddIncomeOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
@@ -204,65 +216,157 @@ export default function Home() {
         isCloudConnected={isCloudConnected}
       />
 
-      {/* Ana Gövde */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
+      {/* Ana Govde */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
         
-        {/* Özet ve Kişi Kartları */}
-        <SummaryCards
-          budget={budget}
-          persons={settings.persons}
-          selectedPersonId={selectedPersonId}
-          onSelectPerson={setSelectedPersonId}
-        />
-
-        {/* İki Sütunlu Ana Panel (Geniş Ekranda Yan Yana, Mobilde Alt Alta) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          
-          {/* Sol Kolon: Sabit Giderler ve Faturalar (5 birim) */}
-          <div className="lg:col-span-5 space-y-5">
-            <FixedExpensesCard
-              fixedExpenses={budget.fixedExpenses}
+        {/* 1. ANASAYFA GORUNUMU: Ozet, Kisi Harcamalari, Nereye Ne Kadar Harcadik */}
+        {currentView === 'dashboard' && (
+          <div className="space-y-5">
+            {/* Toplam Gelir, Gider, Net Butce ve Kisi Bazli Harcamalar */}
+            <SummaryCards
+              budget={budget}
               persons={settings.persons}
-              categories={settings.categories}
               selectedPersonId={selectedPersonId}
-              onTogglePaid={handleTogglePaid}
-              onUpdateAmount={handleUpdateFixedAmount}
-              onDeleteExpense={handleDeleteFixedExpense}
-              onAddFixedExpense={handleAddFixedExpense}
+              onSelectPerson={setSelectedPersonId}
             />
 
-            {/* Kategori Dağılım Grafiği */}
+            {/* Nereye Ne Kadar Harcadik? (Kategori Dagilimi - Artik Genis ve Ferah) */}
             <CategoryBreakdown
               budget={budget}
               categories={settings.categories}
               selectedPersonId={selectedPersonId}
+              onGoToAccounting={() => setCurrentView('accounting')}
             />
           </div>
+        )}
 
-          {/* Sağ Kolon: Günlük & Değişken Harcama Akışı (7 birim) */}
-          <div className="lg:col-span-7">
-            <VariableExpensesCard
-              expenses={budget.expenses}
-              persons={settings.persons}
-              categories={settings.categories}
-              selectedPersonId={selectedPersonId}
-              onDeleteExpense={handleDeleteExpense}
-              onOpenAddExpense={() => setIsAddExpenseOpen(true)}
-            />
+        {/* 2. MUHASEBE GORUNUMU: Fatura ve Harcama Islemleri, Girisler ve Dokumler */}
+        {currentView === 'accounting' && (
+          <div className="space-y-5">
+            
+            {/* Hizli Filtre & Islemler Paneli */}
+            <div className="bg-white rounded-xl border border-zinc-200 p-3.5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1 mr-1">
+                  <Users className="w-3.5 h-3.5 text-zinc-400" /> Kişi:
+                </span>
+                <button
+                  onClick={() => setSelectedPersonId('all')}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                    selectedPersonId === 'all'
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                  }`}
+                >
+                  Tümü
+                </button>
+                {settings.persons.map(p => (
+                  <button
+                    key={p.id}
+                    onClick={() => setSelectedPersonId(selectedPersonId === p.id ? 'all' : p.id)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+                      selectedPersonId === p.id
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                    }`}
+                  >
+                    <span>{p.avatar}</span>
+                    <span>{p.name}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => setIsAddIncomeOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition cursor-pointer border border-emerald-200"
+                >
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  <span>Gelir Ekle</span>
+                </button>
+
+                <button
+                  onClick={() => setIsAddExpenseOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Harcama Ekle</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Iki Kolonlu Muhasebe Tablosu */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              
+              {/* Sol Kolon: Sabit Giderler & Faturalar + Gelirler (5 birim) */}
+              <div className="lg:col-span-5 space-y-5">
+                <FixedExpensesCard
+                  fixedExpenses={budget.fixedExpenses}
+                  persons={settings.persons}
+                  categories={settings.categories}
+                  selectedPersonId={selectedPersonId}
+                  onTogglePaid={handleTogglePaid}
+                  onUpdateAmount={handleUpdateFixedAmount}
+                  onDeleteExpense={handleDeleteFixedExpense}
+                  onAddFixedExpense={handleAddFixedExpense}
+                />
+
+                <IncomesCard
+                  incomes={budget.incomes}
+                  persons={settings.persons}
+                  selectedPersonId={selectedPersonId}
+                  onDeleteIncome={handleDeleteIncome}
+                  onOpenAddIncome={() => setIsAddIncomeOpen(true)}
+                />
+              </div>
+
+              {/* Sag Kolon: Gunluk & Degisken Harcamalar (7 birim) */}
+              <div className="lg:col-span-7">
+                <VariableExpensesCard
+                  expenses={budget.expenses}
+                  persons={settings.persons}
+                  categories={settings.categories}
+                  selectedPersonId={selectedPersonId}
+                  onDeleteExpense={handleDeleteExpense}
+                  onOpenAddExpense={() => setIsAddExpenseOpen(true)}
+                />
+              </div>
+
+            </div>
+
           </div>
-
-        </div>
+        )}
 
       </main>
 
-      {/* Mobil İçin Başparmak Dostu Hızlı Harcama Ekleme Butonu (Floating Button) */}
-      <div className="sm:hidden fixed bottom-5 right-5 z-40">
+      {/* Mobil Icin Alt Gezinti Cubugu (Bottom Navigation Bar) */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-200 px-4 py-2 flex items-center justify-around shadow-lg">
+        <button
+          onClick={() => setCurrentView('dashboard')}
+          className={`flex flex-col items-center gap-0.5 text-[11px] font-semibold transition cursor-pointer ${
+            currentView === 'dashboard' ? 'text-emerald-600 font-bold' : 'text-zinc-500'
+          }`}
+        >
+          <LayoutDashboard className="w-5 h-5" />
+          <span>Anasayfa</span>
+        </button>
+
         <button
           onClick={() => setIsAddExpenseOpen(true)}
-          className="w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg flex items-center justify-center transition active:scale-95 cursor-pointer"
+          className="w-12 h-12 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-md flex items-center justify-center transition active:scale-95 cursor-pointer -mt-5 border-4 border-white"
           aria-label="Harcama Ekle"
         >
           <Plus className="w-6 h-6 stroke-[2.5]" />
+        </button>
+
+        <button
+          onClick={() => setCurrentView('accounting')}
+          className={`flex flex-col items-center gap-0.5 text-[11px] font-semibold transition cursor-pointer ${
+            currentView === 'accounting' ? 'text-emerald-600 font-bold' : 'text-zinc-500'
+          }`}
+        >
+          <ReceiptText className="w-5 h-5" />
+          <span>Muhasebe</span>
         </button>
       </div>
 

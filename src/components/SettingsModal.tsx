@@ -22,15 +22,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onConnectFirebase,
   isCloudConnected,
 }) => {
-  const [activeTab, setActiveTab] = useState<'fixed_template' | 'persons' | 'cloud'>('fixed_template');
-
-  // Sabit şablonlar
-  const [templates, setTemplates] = useState(settings.defaultFixedExpenses || []);
-  const [newTitle, setNewTitle] = useState('');
-  const [newAmount, setNewAmount] = useState('');
-  const [newPerson, setNewPerson] = useState<PersonId>('ortak');
-  const [newCategory, setNewCategory] = useState('fatura');
-  const [newDueDate, setNewDueDate] = useState('');
+  const [activeTab, setActiveTab] = useState<'persons' | 'cloud'>('persons');
 
   // Kişiler
   const [persons, setPersons] = useState<Person[]>(settings.persons || []);
@@ -96,34 +88,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleAddTemplate = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTitle.trim()) return;
-
-    const updated = [
-      ...templates,
-      {
-        title: newTitle.trim(),
-        expectedAmount: parseFormattedAmount(newAmount) || 0,
-        categoryId: newCategory,
-        personId: newPerson,
-        dueDate: newDueDate ? (parseInt(newDueDate, 10) || 15) : undefined,
-      }
-    ];
-    setTemplates(updated);
-    onSaveSettings({ ...settings, defaultFixedExpenses: updated });
-
-    setNewTitle('');
-    setNewAmount('');
-    setNewDueDate('');
-  };
-
-  const handleDeleteTemplate = (index: number) => {
-    const updated = templates.filter((_, i) => i !== index);
-    setTemplates(updated);
-    onSaveSettings({ ...settings, defaultFixedExpenses: updated });
-  };
-
   const handleSaveFirebase = () => {
     if (!firebaseInput.trim()) return;
     onConnectFirebase(firebaseInput.trim());
@@ -137,7 +101,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         
         {/* Üst Bar */}
         <div className="px-5 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50">
-          <h3 className="font-bold text-base text-zinc-900">Ayarlar ve Şablonlar</h3>
+          <h3 className="font-bold text-base text-zinc-900">Ayarlar</h3>
           <button
             onClick={onClose}
             className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200 transition cursor-pointer"
@@ -149,17 +113,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         {/* Sekmeler */}
         <div className="flex border-b border-zinc-200 px-5 pt-2 gap-4 text-xs font-semibold">
           <button
-            onClick={() => setActiveTab('fixed_template')}
-            className={`pb-2.5 transition border-b-2 cursor-pointer ${
-              activeTab === 'fixed_template'
-                ? 'border-emerald-600 text-emerald-700'
-                : 'border-transparent text-zinc-500 hover:text-zinc-800'
-            }`}
-          >
-            Her Ay Otomatik Gelen Faturalar
-          </button>
-
-          <button
             onClick={() => setActiveTab('persons')}
             className={`pb-2.5 transition border-b-2 cursor-pointer ${
               activeTab === 'persons'
@@ -167,7 +120,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 : 'border-transparent text-zinc-500 hover:text-zinc-800'
             }`}
           >
-            Kişiler
+            Kişiler & Roller
           </button>
 
           <button
@@ -184,132 +137,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* İçerik */}
         <div className="p-5 overflow-y-auto space-y-4 flex-1">
-          
-          {/* 1. Sabit Şablonlar */}
-          {activeTab === 'fixed_template' && (
-            <div className="space-y-4">
-              <p className="text-xs text-zinc-500">
-                Buradaki faturalar ve sabit giderler, her yeni aya geçtiğinizde listenize otomatik olarak eklenir. Annenizin her ay tekrar tekrar aynı şeyleri yazmasına gerek kalmaz.
-              </p>
-
-              {/* Yeni Şablon Ekleme */}
-              <form onSubmit={handleAddTemplate} className="p-4 bg-zinc-50 border border-zinc-200 rounded-xl space-y-3 text-xs">
-                <div className="font-bold text-zinc-900 text-sm">Listeye Yeni Sabit Gider Ekle</div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
-                      Sabit Gider / Fatura Adı *
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Örn: Kira, Elektrik, İnternet"
-                      value={newTitle}
-                      onChange={e => setNewTitle(e.target.value)}
-                      required
-                      className="w-full px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
-                      Standart Tutar (₺)
-                    </label>
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      placeholder="0 (Değişkense boş bırakın)"
-                      value={newAmount}
-                      onChange={e => setNewAmount(formatAmountInput(e.target.value))}
-                      className="w-full px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
-                      Sorumlu Kişi
-                    </label>
-                    <select
-                      value={newPerson}
-                      onChange={e => setNewPerson(e.target.value)}
-                      className="w-full px-2 py-1.5 border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                    >
-                      {settings.persons.map(p => (
-                        <option key={p.id} value={p.id}>{p.avatar} {p.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
-                      Kategori
-                    </label>
-                    <select
-                      value={newCategory}
-                      onChange={e => setNewCategory(e.target.value)}
-                      className="w-full px-2 py-1.5 border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                    >
-                      {settings.categories.map(c => (
-                        <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
-                      Ödeme Günü
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="31"
-                      placeholder="Örn: 15 (İsteğe bağlı)"
-                      value={newDueDate}
-                      onChange={e => setNewDueDate(e.target.value)}
-                      className="w-full px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end pt-1">
-                  <button
-                    type="submit"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5" /> Şablona Ekle
-                  </button>
-                </div>
-              </form>
-
-              {/* Mevcut Şablon Listesi */}
-              <div className="divide-y divide-zinc-200 border border-zinc-200 rounded-xl overflow-hidden bg-white text-xs">
-                {templates.map((tpl, i) => (
-                  <div key={i} className="p-3 flex items-center justify-between hover:bg-zinc-50">
-                    <div>
-                      <div className="font-semibold text-zinc-900">{tpl.title}</div>
-                      <div className="text-[11px] text-zinc-500 mt-0.5">
-                        Ayın {tpl.dueDate || 15}. günü • Sorumlu: {settings.persons.find(p => p.id === tpl.personId)?.name}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="font-bold text-zinc-800">
-                        {tpl.expectedAmount ? `${tpl.expectedAmount.toLocaleString('tr-TR')} ₺` : 'Değişken'}
-                      </span>
-                      <button
-                        onClick={() => handleDeleteTemplate(i)}
-                        className="text-zinc-300 hover:text-rose-600 transition p-1 cursor-pointer"
-                        title="Şablondan kaldır"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* 2. Kişiler */}
           {activeTab === 'persons' && (
