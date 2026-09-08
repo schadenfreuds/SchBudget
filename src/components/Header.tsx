@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { formatMonthDisplay, getAdjacentMonth } from '@/lib/storage';
-import { ChevronLeft, ChevronRight, Download, Plus, Settings, TrendingUp, Cloud, CloudOff } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, Plus, Settings, TrendingUp, Cloud, CloudOff, Sparkles } from 'lucide-react';
 
 interface HeaderProps {
   currentMonth: string;
@@ -11,6 +11,7 @@ interface HeaderProps {
   onOpenAddIncome: () => void;
   onOpenSettings: () => void;
   onExportExcel: () => void;
+  onLoadMockup?: () => void;
   isCloudConnected: boolean;
 }
 
@@ -21,6 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAddIncome,
   onOpenSettings,
   onExportExcel,
+  onLoadMockup,
   isCloudConnected,
 }) => {
   const handlePrevMonth = () => {
@@ -98,6 +100,17 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Aksiyon Butonları */}
           <div className="flex items-center justify-end gap-2">
+            {onLoadMockup && (
+              <button
+                onClick={onLoadMockup}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-medium text-amber-800 bg-amber-50 hover:bg-amber-100 rounded-lg transition cursor-pointer border border-amber-200"
+                title="Bu aya 1 aylık gerçekçi örnek bütçe verisi yükle"
+              >
+                <Sparkles className="w-4 h-4 text-amber-600" />
+                <span className="hidden sm:inline">Örnek Veri</span>
+              </button>
+            )}
+
             <button
               onClick={onExportExcel}
               className="inline-flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-medium text-zinc-700 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition cursor-pointer border border-zinc-200"

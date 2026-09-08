@@ -9,6 +9,7 @@ import {
   loadMonthWithCloud,
   saveMonthWithCloud,
   saveLocalMonth,
+  getMockupMonthBudget,
 } from '@/lib/storage';
 import { initFirebase, subscribeToMonth } from '@/lib/firebase';
 import { exportBudgetToExcel } from '@/lib/excelExport';
@@ -147,6 +148,15 @@ export default function Home() {
     exportBudgetToExcel(budget, settings);
   };
 
+  // 8.5 Örnek Demo Verisi Yükle
+  const handleLoadMockup = () => {
+    if (confirm('Mevcut aya 1 aylık gerçekçi örnek bütçe ve harcama verileri yüklensin mi?')) {
+      const mock = getMockupMonthBudget(currentMonth);
+      setBudget(mock);
+      saveMonthWithCloud(mock);
+    }
+  };
+
   // 9. Ayarları Kaydet
   const handleSaveSettings = (newSettings: AppSettings) => {
     setSettingsState(newSettings);
@@ -190,6 +200,7 @@ export default function Home() {
         onOpenAddIncome={() => setIsAddIncomeOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onExportExcel={handleExportExcel}
+        onLoadMockup={handleLoadMockup}
         isCloudConnected={isCloudConnected}
       />
 
