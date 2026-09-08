@@ -48,7 +48,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     { label: 'Camgöbeği', value: 'bg-teal-100 text-teal-700 border-teal-200' },
   ];
 
-  const AVATAR_OPTIONS = ['👩', '👨', '🧒', '🐱', '🐶', '🏠'];
+  const AVATAR_OPTIONS = ['👩', '👨', '👦', '👧', '🐱', '🐶', '🏠'];
 
   const handleAddPerson = (e: React.FormEvent) => {
     e.preventDefault();
