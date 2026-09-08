@@ -295,13 +295,13 @@ export default function Home() {
       />
 
       {/* Ana Gövde */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3.5 sm:py-5 overflow-hidden">
         
         {/* ======================================================== */}
         {/* 1. ANASAYFA GÖRÜNÜMÜ: Özet, Ödeme Kanalları, Kişi Harcamaları, Kategori Dağılımı */}
         {/* ======================================================== */}
         {currentView === 'dashboard' && (
-          <div className="space-y-5">
+          <div className="space-y-4 sm:space-y-5">
             <SummaryCards
               budget={budget}
               persons={settings.persons}
@@ -322,17 +322,17 @@ export default function Home() {
         {/* 2. MUHASEBE GÖRÜNÜMÜ: Hızlı Harcama Şablonları & Günlük Harcamalar Akışı */}
         {/* ======================================================== */}
         {currentView === 'accounting' && (
-          <div className="space-y-5">
+          <div className="space-y-4 sm:space-y-5">
             
             {/* Hızlı Filtre Paneli */}
-            <div className="bg-white rounded-xl border border-zinc-200 p-3.5 shadow-xs flex items-center justify-between">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1 mr-1">
+            <div className="bg-white rounded-xl border border-zinc-200 p-2.5 sm:p-3.5 shadow-xs flex items-center justify-between overflow-hidden">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 w-full sm:w-auto">
+                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
                   <Users className="w-3.5 h-3.5 text-zinc-400" /> Kişi:
                 </span>
                 <button
                   onClick={() => setSelectedPersonId('all')}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer shrink-0 ${
                     selectedPersonId === 'all'
                       ? 'bg-emerald-600 text-white shadow-xs'
                       : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
@@ -344,7 +344,7 @@ export default function Home() {
                   <button
                     key={p.id}
                     onClick={() => setSelectedPersonId(selectedPersonId === p.id ? 'all' : p.id)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shrink-0 ${
                       selectedPersonId === p.id
                         ? 'bg-emerald-600 text-white shadow-xs'
                         : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
@@ -356,7 +356,7 @@ export default function Home() {
                 ))}
               </div>
 
-              <span className="text-[11px] text-zinc-400 font-medium hidden sm:inline">
+              <span className="text-[11px] text-zinc-400 font-medium hidden lg:inline shrink-0">
                 Sola dokunarak hızlı ekleyin, sağdan tüm dökümü filtreleyin
               </span>
             </div>
@@ -406,14 +406,14 @@ export default function Home() {
           <div className="space-y-5">
             
             {/* Hızlı Kişi Filtresi */}
-            <div className="bg-white rounded-xl border border-zinc-200 p-3.5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1 mr-1">
+            <div className="bg-white rounded-xl border border-zinc-200 p-2.5 sm:p-3.5 shadow-xs flex items-center justify-between overflow-hidden">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 w-full sm:w-auto">
+                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
                   <Users className="w-3.5 h-3.5 text-zinc-400" /> Kişi:
                 </span>
                 <button
                   onClick={() => setSelectedPersonId('all')}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer shrink-0 ${
                     selectedPersonId === 'all'
                       ? 'bg-emerald-600 text-white shadow-xs'
                       : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
@@ -425,7 +425,7 @@ export default function Home() {
                   <button
                     key={p.id}
                     onClick={() => setSelectedPersonId(selectedPersonId === p.id ? 'all' : p.id)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shrink-0 ${
                       selectedPersonId === p.id
                         ? 'bg-emerald-600 text-white shadow-xs'
                         : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
@@ -437,8 +437,8 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="text-xs text-zinc-500 font-medium">
-                Bu ayki faturalarınızı tikleyin veya sağ taraftan kalıcı şablonlarınızı yönetin.
+              <div className="text-xs text-zinc-400 font-medium hidden lg:inline shrink-0">
+                Bu ayki faturalarınızı tikleyin veya şablonlarınızı yönetin.
               </div>
             </div>
 
@@ -479,14 +479,14 @@ export default function Home() {
           <div className="space-y-5">
             
             {/* Hızlı Kişi Filtresi */}
-            <div className="bg-white rounded-xl border border-zinc-200 p-3.5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1 mr-1">
+            <div className="bg-white rounded-xl border border-zinc-200 p-2.5 sm:p-3.5 shadow-xs flex items-center justify-between overflow-hidden">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 w-full sm:w-auto">
+                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
                   <Users className="w-3.5 h-3.5 text-zinc-400" /> Kişi:
                 </span>
                 <button
                   onClick={() => setSelectedPersonId('all')}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer shrink-0 ${
                     selectedPersonId === 'all'
                       ? 'bg-emerald-600 text-white shadow-xs'
                       : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
@@ -498,7 +498,7 @@ export default function Home() {
                   <button
                     key={p.id}
                     onClick={() => setSelectedPersonId(selectedPersonId === p.id ? 'all' : p.id)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shrink-0 ${
                       selectedPersonId === p.id
                         ? 'bg-emerald-600 text-white shadow-xs'
                         : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
@@ -510,8 +510,8 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="text-xs text-zinc-500 font-medium">
-                Gelirlerinizi kaydedin ve aylık tavan bütçenizi kontrol altında tutun.
+              <div className="text-xs text-zinc-400 font-medium hidden lg:inline shrink-0">
+                Gelirlerinizi kaydedin ve aylık tavan bütçenizi kontrol edin.
               </div>
             </div>
 
@@ -548,7 +548,7 @@ export default function Home() {
       </main>
 
       {/* Mobil İçin Alt Gezinti Çubuğu (Bottom Navigation Bar - 4 Sekme + Ortada +) */}
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-200 px-3 py-1.5 flex items-center justify-between shadow-lg">
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-zinc-200 px-3 py-1.5 flex items-center justify-between shadow-lg pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))]">
         <button
           onClick={() => setCurrentView('dashboard')}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition cursor-pointer flex-1 ${

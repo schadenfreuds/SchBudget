@@ -99,11 +99,11 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
             />
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="grid grid-cols-2 gap-1.5 w-full sm:w-auto sm:flex sm:items-center">
             <select
               value={selectedCategory}
               onChange={e => setSelectedCategory(e.target.value)}
-              className="px-2.5 py-1.5 text-xs bg-white border border-zinc-300 rounded-lg text-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full sm:w-auto px-2 py-1.5 text-xs bg-white border border-zinc-300 rounded-lg text-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 truncate"
             >
               <option value="all">Tüm Kategoriler</option>
               {categories.map(c => (
@@ -114,7 +114,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
             <select
               value={paymentFilter}
               onChange={e => setPaymentFilter(e.target.value as 'all' | 'kredi_karti' | 'nakit')}
-              className="px-2.5 py-1.5 text-xs bg-white border border-zinc-300 rounded-lg text-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full sm:w-auto px-2 py-1.5 text-xs bg-white border border-zinc-300 rounded-lg text-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 truncate"
             >
               <option value="all">💳/💵 Tümü</option>
               <option value="kredi_karti">💳 Kredi Kartı</option>
@@ -150,30 +150,30 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
                 className="p-3 rounded-lg flex items-center justify-between gap-3 hover:bg-zinc-50 transition group"
               >
                 {/* Sol: İkon + Başlık + Kişi + Tarih */}
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center text-base shrink-0">
+                <div className="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-zinc-100 flex items-center justify-center text-sm sm:text-base shrink-0 mt-0.5 sm:mt-0">
                     {category?.icon || '🛒'}
                   </div>
 
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-sm font-semibold text-zinc-900 truncate">
+                      <span className="text-xs sm:text-sm font-semibold text-zinc-900 truncate">
                         {expense.title}
                       </span>
                       {expense.note && (
-                        <span className="text-xs text-zinc-400 truncate max-w-[120px]" title={expense.note}>
+                        <span className="text-[11px] text-zinc-400 truncate max-w-[100px]" title={expense.note}>
                           ({expense.note})
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 mt-0.5 text-[11px] text-zinc-500">
+                    <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-zinc-500 flex-wrap">
                       <span className="font-medium text-zinc-600">
                         {formatDateLabel(expense.date)}
                       </span>
                       <span>•</span>
                       {person && (
-                        <span className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded font-medium border text-[10px] ${person.color}`}>
+                        <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded font-medium border text-[10px] ${person.color}`}>
                           <span>{person.avatar}</span>
                           <span>{person.name}</span>
                         </span>
@@ -203,12 +203,12 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
                 </div>
 
                 {/* Sağ: Tutar + Düzenle & Sil butonları */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-sm font-bold text-zinc-900">
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-1">
+                  <span className="text-xs sm:text-sm font-bold text-zinc-900">
                     {Number(expense.amount).toLocaleString('tr-TR')} ₺
                   </span>
 
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-0.5">
                     <button
                       onClick={() => onEditExpense(expense)}
                       className="text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 p-1 rounded-md transition cursor-pointer"

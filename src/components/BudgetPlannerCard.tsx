@@ -142,11 +142,11 @@ export const BudgetPlannerCard: React.FC<BudgetPlannerCardProps> = ({
         {/* Büyük İlerleme Çubuğu ve Durum */}
         <div className="pt-4 space-y-3">
           
-          <div className="flex items-center justify-between text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
             <span className="font-semibold text-zinc-700">
               Harcanan: <strong className="text-zinc-900 font-bold">{formatCurrency(totalExpense)}</strong>
             </span>
-            <span className={`font-bold px-2 py-0.5 rounded-full text-xs ${
+            <span className={`font-bold px-2 py-0.5 rounded-full text-[11px] sm:text-xs ${
               totalExpense > budgetLimit
                 ? 'bg-rose-100 text-rose-800'
                 : expensePercentage >= 80

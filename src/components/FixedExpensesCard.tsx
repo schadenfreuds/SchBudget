@@ -288,11 +288,11 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                 }`}
               >
                 {/* Sol: Onay kutusu + Bilgi */}
-                <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">
                   <button
                     onClick={() => onTogglePaid(item.id)}
                     aria-label={item.isPaid ? 'Ödendi olarak işaretlendi, geri al' : 'Ödendi olarak işaretle'}
-                    className={`w-6 h-6 rounded-md flex items-center justify-center transition cursor-pointer shrink-0 border ${
+                    className={`w-6 h-6 rounded-md flex items-center justify-center transition cursor-pointer shrink-0 border mt-0.5 sm:mt-0 ${
                       item.isPaid
                         ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
                         : 'border-zinc-300 hover:border-zinc-400 bg-white'
@@ -301,9 +301,9 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                     {item.isPaid && <Check className="w-4 h-4 stroke-[3]" />}
                   </button>
 
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className={`text-sm font-semibold truncate ${item.isPaid ? 'text-zinc-600 line-through' : 'text-zinc-900'}`}>
+                      <span className={`text-xs sm:text-sm font-semibold truncate ${item.isPaid ? 'text-zinc-600 line-through' : 'text-zinc-900'}`}>
                         {item.title}
                       </span>
                       {category && (
@@ -311,9 +311,12 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                           {category.icon}
                         </span>
                       )}
+                      <span className="sm:hidden inline-block">
+                        {renderDueDateBadge(item)}
+                      </span>
                     </div>
 
-                    <div className="flex items-center gap-2 mt-0.5 text-[11px] text-zinc-500">
+                    <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-zinc-500 flex-wrap">
                       {person && (
                         <span className="inline-flex items-center gap-1">
                           <span>{person.avatar}</span>
@@ -332,8 +335,8 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                   </div>
                 </div>
 
-                {/* Sağ: Tutar + Durum + Düzenle & Sil */}
-                <div className="flex items-center gap-2.5 shrink-0">
+                {/* Sağ: Tutar + (Masaüstünde Vade) + Düzenle & Sil */}
+                <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 ml-1">
                   {editingId === item.id ? (
                     <div className="flex items-center gap-1">
                       <input
@@ -345,7 +348,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                           if (e.key === 'Enter') saveEditAmount(item.id);
                           if (e.key === 'Escape') setEditingId(null);
                         }}
-                        className="w-24 px-1.5 py-0.5 border border-emerald-500 rounded text-xs font-bold text-right"
+                        className="w-20 sm:w-24 px-1.5 py-0.5 border border-emerald-500 rounded text-xs font-bold text-right"
                         autoFocus
                       />
                       <button
@@ -361,15 +364,17 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                       title="Tutarı hızlıca değiştirmek için tıkla"
                       className="group/btn flex items-center gap-1 text-right cursor-pointer"
                     >
-                      <span className={`text-sm font-bold ${item.isPaid ? 'text-zinc-600' : 'text-zinc-900'}`}>
+                      <span className={`text-xs sm:text-sm font-bold ${item.isPaid ? 'text-zinc-600' : 'text-zinc-900'}`}>
                         {amount.toLocaleString('tr-TR')} ₺
                       </span>
                       <Edit3 className="w-3 h-3 text-zinc-300 group-hover/btn:text-zinc-600 transition" />
                     </button>
                   )}
 
-                  {/* Akıllı Vade Rozeti */}
-                  {renderDueDateBadge(item)}
+                  {/* Akıllı Vade Rozeti (Masaüstünde burada gösterilir) */}
+                  <span className="hidden sm:inline-block">
+                    {renderDueDateBadge(item)}
+                  </span>
 
                   {/* Düzenleme ve Silme Butonları */}
                   <div className="flex items-center gap-0.5">

@@ -132,14 +132,14 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
                 Harcama Ödeme Kanalları
               </span>
             </div>
-            <div className="flex flex-wrap items-center gap-3 text-xs font-medium">
-              <span className="text-indigo-700 flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-medium">
+              <span className="text-indigo-700 flex items-center gap-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block" />
-                Kredi Kartı Ekstresi: <strong className="font-bold">{formatCurrency(creditCardTotal)}</strong> ({cardPct}%)
+                Kart: <strong className="font-bold">{formatCurrency(creditCardTotal)}</strong> ({cardPct}%)
               </span>
-              <span className="text-emerald-700 flex items-center gap-1.5">
+              <span className="text-emerald-700 flex items-center gap-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
-                Nakit / Banka: <strong className="font-bold">{formatCurrency(cashTotal)}</strong> ({cashPct}%)
+                Nakit: <strong className="font-bold">{formatCurrency(cashTotal)}</strong> ({cashPct}%)
               </span>
             </div>
           </div>
@@ -164,7 +164,7 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-zinc-800">Kişi Bazlı Harcamalar</span>
-            <span className="text-xs text-zinc-400 font-normal">(Filtrelemek için tıkla)</span>
+            <span className="text-xs text-zinc-400 font-normal hidden sm:inline">(Filtrelemek için tıkla)</span>
           </div>
           {selectedPersonId !== 'all' && (
             <button
@@ -193,7 +193,7 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
               <button
                 key={person.id}
                 onClick={() => onSelectPerson(isSelected ? 'all' : person.id)}
-                className={`p-3 rounded-lg border text-left transition cursor-pointer flex flex-col justify-between ${
+                className={`p-2.5 sm:p-3 rounded-lg border text-left transition cursor-pointer flex flex-col justify-between overflow-hidden ${
                   isSelected
                     ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-400/30'
                     : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50/70'
@@ -201,13 +201,13 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="text-base">{person.avatar}</span>
-                  <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600">
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 truncate max-w-[80px]">
                     {person.role || person.name}
                   </span>
                 </div>
-                <div className="mt-2">
+                <div className="mt-2 min-w-0">
                   <div className="text-xs font-semibold text-zinc-700 truncate">{person.name}</div>
-                  <div className="text-sm sm:text-base font-bold text-zinc-900 mt-0.5">
+                  <div className="text-sm sm:text-base font-bold text-zinc-900 mt-0.5 truncate">
                     {formatCurrency(pTotal)}
                   </div>
                 </div>
