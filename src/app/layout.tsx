@@ -25,13 +25,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Aile Bütçesi | Ev Muhasebesi & Gider Takibi",
+  title: "SchBudget | Family & Home Accounting",
   description: "Aile ve ev ortak giderleri için sade, pratik aylık bütçe, fatura ve harcama takip sistemi.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Aile Bütçesi",
+    title: "SchBudget",
   },
   icons: {
     icon: [

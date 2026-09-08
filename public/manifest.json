@@ -1,7 +1,7 @@
 {
-  "name": "Aile Bütçesi & Ev Muhasebesi",
-  "short_name": "Aile Bütçesi",
-  "description": "Aile ve ev ortak giderleri için pratik bütçe, fatura ve harcama takip sistemi",
+  "name": "SchBudget - Family & Home Accounting",
+  "short_name": "SchBudget",
+  "description": "Family and home personal accounting, budget, recurring bills and expense management system",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#09090b",

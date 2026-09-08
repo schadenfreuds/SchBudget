@@ -76,8 +76,8 @@ export const Header: React.FC<HeaderProps> = ({
             {currencySymbol}
           </div>
           <div>
-            <h1 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 leading-tight">
-              {t('appTitle')}
+            <h1 className="text-sm sm:text-base font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight">
+              <span className="text-emerald-600 dark:text-emerald-400 font-black">Sch</span>Budget
             </h1>
             <div className="flex items-center gap-1 text-[10px] text-zinc-400 dark:text-zinc-500">
               {isCloudConnected ? (

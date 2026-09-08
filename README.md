@@ -1,6 +1,8 @@
-# 🏡 Aile Bütçesi & Ev Muhasebesi (Family Budget)
+# 🏡 SchBudget
 
-> Karmaşık Excel formüllerinden, köprülerden ve kaybolan tablolardan bunalan evler için tasarlanmış; sıfır sürtünmeli, modern, gizlilik odaklı ve çevrimdışı (offline-first) aile bütçesi uygulaması.
+> Karmaşık Excel formüllerinden ve kaybolan tablolardan bunalan evler ve bireyler için tasarlanmış; sıfır sürtünmeli, modern, çok dilli (TR / EN), çoklu para birimli ve çevrimdışı (offline-first) bütçe ve ev muhasebesi uygulaması.
+>
+> *Clean, zero-friction, privacy-first personal and family budget tracker with dual storage (LocalStorage & Cloud Sync).*
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.3.4-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)](https://react.dev/)
@@ -35,6 +37,10 @@
 6. **☁️ Çift Katmanlı Hafıza (Gizlilik & Sıfır Maliyet):**
    - **Yerel Hafıza (LocalStorage):** İnternet olmadan, sunucusuz ve hesap açmadan doğrudan tarayıcınızda %100 gizli çalışır.
    - **İsteğe Bağlı Firebase Firestore:** Telefon ve bilgisayar arasında 7/24 anlık senkronizasyon isterseniz ücretsiz Firebase anahtarınızı Ayarlar panelinden tek tıkla bağlayabilirsiniz.
+
+7. **🌍 Çok Dilli (i18n) & Çoklu Para Birimi:**
+   - Türkçe ve İngilizce tam arayüz desteği.
+   - İhtiyaca göre TL (₺), USD ($), EUR (€) ve GBP (£) para birimi desteği.
 
 ---
 

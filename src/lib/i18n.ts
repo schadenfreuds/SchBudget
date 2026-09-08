@@ -17,7 +17,7 @@ export const CURRENCIES: Record<CurrencyCode, CurrencyConfig> = {
 
 export const translations = {
   tr: {
-    appTitle: 'Ev Muhasebesi',
+    appTitle: 'SchBudget',
     appSubtitle: 'Aile & Ev Bütçesi',
     cloud: 'Bulut',
     local: 'Yerel',
@@ -368,7 +368,7 @@ export const translations = {
   },
 
   en: {
-    appTitle: 'Home Budget',
+    appTitle: 'SchBudget',
     appSubtitle: 'Family & Home Accounting',
     cloud: 'Cloud',
     local: 'Local',
