@@ -10,9 +10,11 @@ import {
   loadMonthWithCloud,
   saveMonthWithCloud,
   saveLocalMonth,
+  createInitialMonthBudget,
   getMockupMonthBudget,
 } from '@/lib/storage';
-import { initFirebase, subscribeToMonth } from '@/lib/firebase';
+import { clearAllLocalData } from '@/lib/backup';
+import { initFirebase, subscribeToMonth, saveMonthToFirebase } from '@/lib/firebase';
 import { exportBudgetToExcel } from '@/lib/excelExport';
 
 import { Header, AppView } from '@/components/Header';
@@ -37,7 +39,7 @@ import { DEFAULT_APP_SETTINGS } from '@/lib/constants';
 export default function Home() {
   const [currentMonth, setCurrentMonth] = useState<string>(() => getMonthKey());
   const [settings, setSettingsState] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
-  const [budget, setBudget] = useState<MonthlyBudget>(() => getMockupMonthBudget(getMonthKey()));
+  const [budget, setBudget] = useState<MonthlyBudget>(() => createInitialMonthBudget(getMonthKey()));
   const [selectedPersonId, setSelectedPersonId] = useState<PersonId | 'all'>('all');
   const [isCloudConnected, setIsCloudConnected] = useState<boolean>(false);
   const [currentView, setCurrentView] = useState<AppView>('dashboard');
@@ -263,6 +265,23 @@ export default function Home() {
       setBudget(mock);
       saveMonthWithCloud(mock);
     }
+  };
+
+  // 9.6 Tüm Verileri Sıfırla (Temiz Sayfa Aç)
+  const handleResetAllData = async () => {
+    clearAllLocalData();
+    const clean = createInitialMonthBudget(currentMonth);
+    setBudget(clean);
+    setSettingsState(DEFAULT_APP_SETTINGS);
+    saveLocalMonth(clean);
+    if (isCloudConnected) {
+      try {
+        await saveMonthToFirebase(clean);
+      } catch (e) {
+        console.warn('Bulut verisi sıfırlanamadı:', e);
+      }
+    }
+    window.location.reload();
   };
 
   // 10. Ayarları Kaydet
@@ -665,6 +684,7 @@ export default function Home() {
         onConnectFirebase={handleConnectFirebase}
         isCloudConnected={isCloudConnected}
         onLoadMockup={handleLoadMockup}
+        onResetAllData={handleResetAllData}
         onDataRestored={() => fetchMonthData(currentMonth)}
       />
 

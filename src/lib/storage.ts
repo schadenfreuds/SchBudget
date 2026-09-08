@@ -63,16 +63,19 @@ export function createInitialMonthBudget(monthKey: string): MonthlyBudget {
   const settings = loadSettings();
   const fixedTemplates = settings.defaultFixedExpenses || DEFAULT_FIXED_TEMPLATES;
 
-  const fixedExpenses: FixedExpenseItem[] = fixedTemplates.map((tpl, index) => ({
-    id: `fixed_${monthKey}_${index}_${Date.now()}`,
-    title: tpl.title,
-    expectedAmount: tpl.expectedAmount,
-    actualAmount: tpl.expectedAmount,
-    categoryId: tpl.categoryId,
-    personId: tpl.personId,
-    isPaid: false,
-    dueDate: tpl.dueDate,
-  }));
+  // Sadece beklenen tutarı girilmiş şablonları dahil et, sıfırları ay listesinde kalabalık yapmasın
+  const fixedExpenses: FixedExpenseItem[] = fixedTemplates
+    .filter(tpl => tpl.expectedAmount > 0)
+    .map((tpl, index) => ({
+      id: `fixed_${monthKey}_${index}_${Date.now()}`,
+      title: tpl.title,
+      expectedAmount: tpl.expectedAmount,
+      actualAmount: tpl.expectedAmount,
+      categoryId: tpl.categoryId,
+      personId: tpl.personId,
+      isPaid: false,
+      dueDate: tpl.dueDate,
+    }));
 
   return {
     monthKey,
@@ -128,25 +131,21 @@ export function getMockupMonthBudget(monthKey: string = '2026-09'): MonthlyBudge
 }
 
 export function loadLocalMonth(monthKey: string): MonthlyBudget {
-  if (typeof window === 'undefined') return getMockupMonthBudget(monthKey);
+  if (typeof window === 'undefined') return createInitialMonthBudget(monthKey);
 
   try {
     const saved = localStorage.getItem(`${BUDGET_PREFIX}${monthKey}`);
     if (saved) {
       const parsed = JSON.parse(saved);
-      // Eğer mevcut ay boşsa otomatik zengin mockup ile başlat
-      if (parsed && (!parsed.incomes || parsed.incomes.length === 0) && (!parsed.expenses || parsed.expenses.length === 0)) {
-        const mock = getMockupMonthBudget(monthKey);
-        saveLocalMonth(mock);
-        return mock;
+      if (parsed && Array.isArray(parsed.incomes) && Array.isArray(parsed.expenses)) {
+        return parsed;
       }
-      return parsed;
     }
   } catch (err) {
     console.error('Yerel bütçe okunamadı:', err);
   }
 
-  const initial = getMockupMonthBudget(monthKey);
+  const initial = createInitialMonthBudget(monthKey);
   saveLocalMonth(initial);
   return initial;
 }

@@ -20,6 +20,7 @@ interface SettingsModalProps {
   isCloudConnected: boolean;
   onLoadMockup?: () => void;
   onDataRestored?: () => void;
+  onResetAllData?: () => void | Promise<void>;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -31,6 +32,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   isCloudConnected,
   onLoadMockup,
   onDataRestored,
+  onResetAllData,
 }) => {
   const [activeTab, setActiveTab] = useState<'persons' | 'categories' | 'theme' | 'backup' | 'cloud' | 'devtools'>('persons');
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>('system');
@@ -151,9 +153,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     reader.readAsText(file);
   };
 
-  const handleResetData = () => {
-    if (confirm('DİKKAT: Tarayıcınızdaki tüm geçmiş aylar ve bütçe verileri kalıcı olarak silinecek. Emin misiniz?')) {
-      if (confirm('Son onay: Bu işlem geri alınamaz. Sıfırlansın mı?')) {
+  const handleResetData = async () => {
+    if (window.confirm('DİKKAT: Tarayıcınızdaki tüm geçmiş aylar, gelirler, harcamalar ve ayarlar kalıcı olarak silinecek ve tertemiz bir sayfa açılacaktır.\n\nSıfırlamak istediğinize emin misiniz?')) {
+      if (onResetAllData) {
+        await onResetAllData();
+      } else {
         clearAllLocalData();
         window.location.reload();
       }
