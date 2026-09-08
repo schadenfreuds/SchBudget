@@ -14,7 +14,6 @@ import {
   Target,
   Sun,
   Moon,
-  Languages,
 } from 'lucide-react';
 import { toggleTheme, isDarkModeActive } from '@/lib/theme';
 
@@ -39,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
   onExportExcel,
   isCloudConnected,
 }) => {
-  const { t, formatMonth, currencySymbol, lang, setLang } = useI18n();
+  const { t, formatMonth, currencySymbol } = useI18n();
 
   const handlePrevMonth = () => {
     onMonthChange(getAdjacentMonth(currentMonth, -1));
@@ -189,16 +188,6 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          {/* Hızlı Dil Değiştirici (TR / EN) */}
-          <button
-            onClick={() => setLang(lang === 'tr' ? 'en' : 'tr')}
-            aria-label={lang === 'tr' ? 'Switch to English' : 'Türkçe\'ye Geç'}
-            title={lang === 'tr' ? 'Switch to English' : 'Türkçe\'ye Geç'}
-            className="px-2 py-1 text-xs font-bold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition cursor-pointer border border-transparent hover:border-zinc-200 dark:hover:border-zinc-700 flex items-center gap-1"
-          >
-            <Languages className="w-3.5 h-3.5" />
-            <span>{lang === 'tr' ? 'EN' : 'TR'}</span>
-          </button>
 
           {/* Tema Değiştirici (Koyu / Açık Mod) */}
           <button
