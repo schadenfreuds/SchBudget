@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AppSettings, PersonId } from '@/types/budget';
-import { X, Plus, Trash2, Cloud, Check } from 'lucide-react';
+import { AppSettings, PersonId, Person } from '@/types/budget';
+import { X, Plus, Trash2, Cloud, Check, UserPlus } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -30,6 +30,64 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [newPerson, setNewPerson] = useState<PersonId>('ortak');
   const [newCategory, setNewCategory] = useState('fatura');
   const [newDueDate, setNewDueDate] = useState('15');
+
+  // Kişiler
+  const [persons, setPersons] = useState<Person[]>(settings.persons || []);
+  const [newPersonName, setNewPersonName] = useState('');
+  const [newPersonRole, setNewPersonRole] = useState('');
+  const [newPersonAvatar, setNewPersonAvatar] = useState('🧑');
+  const [newPersonColor, setNewPersonColor] = useState('bg-indigo-100 text-indigo-700 border-indigo-200');
+
+  const COLOR_OPTIONS = [
+    { label: 'Gül', value: 'bg-rose-100 text-rose-700 border-rose-200' },
+    { label: 'Mavi', value: 'bg-blue-100 text-blue-700 border-blue-200' },
+    { label: 'Zümrüt', value: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
+    { label: 'Kehribar', value: 'bg-amber-100 text-amber-700 border-amber-200' },
+    { label: 'Mor', value: 'bg-purple-100 text-purple-700 border-purple-200' },
+    { label: 'İndigo', value: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
+    { label: 'Camgöbeği', value: 'bg-teal-100 text-teal-700 border-teal-200' },
+  ];
+
+  const AVATAR_OPTIONS = ['👩', '👨', '🧒', '👦', '👧', '👵', '🧓', '🧑', '🐱', '🐶', '🏠'];
+
+  const handleAddPerson = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPersonName.trim()) return;
+
+    const newId = `person_${Date.now()}`;
+    const updatedPersons: Person[] = [
+      ...persons,
+      {
+        id: newId,
+        name: newPersonName.trim(),
+        role: newPersonRole.trim() || undefined,
+        avatar: newPersonAvatar || '🧑',
+        color: newPersonColor,
+      }
+    ];
+    setPersons(updatedPersons);
+    onSaveSettings({ ...settings, persons: updatedPersons });
+    setNewPersonName('');
+    setNewPersonRole('');
+  };
+
+  const handleDeletePerson = (id: string) => {
+    if (id === 'ortak' || persons.length <= 1) return;
+    const updatedPersons = persons.filter(p => p.id !== id);
+    setPersons(updatedPersons);
+    onSaveSettings({ ...settings, persons: updatedPersons });
+  };
+
+  const handleUpdatePerson = (id: string, field: 'name' | 'role' | 'avatar', value: string) => {
+    const updatedPersons = persons.map(p => {
+      if (p.id === id) {
+        return { ...p, [field]: value };
+      }
+      return p;
+    });
+    setPersons(updatedPersons);
+    onSaveSettings({ ...settings, persons: updatedPersons });
+  };
 
   // Firebase Config JSON / Input
   const [firebaseInput, setFirebaseInput] = useState('');
@@ -226,18 +284,100 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {/* 2. Kişiler */}
           {activeTab === 'persons' && (
-            <div className="space-y-3">
-              <p className="text-xs text-zinc-500">
-                Evde harcama yapan aile bireyleri. Harcama ve gelirler bu kişilere göre gruplanır.
+            <div className="space-y-4 text-xs">
+              <p className="text-zinc-500">
+                Evde harcama yapan aile bireyleri. İstediğiniz kişiyi ekleyebilir, ismini veya rolünü değiştirebilirsiniz.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {settings.persons.map(p => (
-                  <div key={p.id} className="p-3 rounded-xl border border-zinc-200 flex items-center gap-3 bg-white">
-                    <span className="text-2xl">{p.avatar}</span>
-                    <div>
-                      <div className="text-xs font-bold text-zinc-900">{p.name}</div>
-                      <div className="text-[11px] text-zinc-500">{p.role || 'Birey'}</div>
+
+              {/* Yeni Kişi Ekleme Formu */}
+              <form onSubmit={handleAddPerson} className="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2.5">
+                <div className="font-semibold text-zinc-800 flex items-center gap-1.5">
+                  <UserPlus className="w-4 h-4 text-emerald-600" />
+                  Yeni Birey / Kişi Ekle
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    placeholder="İsim (ör. Can, Tülay, Ayşe...)"
+                    value={newPersonName}
+                    onChange={e => setNewPersonName(e.target.value)}
+                    required
+                    className="px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Rol / Tanım (ör. Anne, Çocuk, Ortak...)"
+                    value={newPersonRole}
+                    onChange={e => setNewPersonRole(e.target.value)}
+                    className="px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white"
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                  <div className="flex items-center gap-1">
+                    <span className="text-[11px] text-zinc-500 mr-1">İkon:</span>
+                    {AVATAR_OPTIONS.slice(0, 8).map(emoji => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        onClick={() => setNewPersonAvatar(emoji)}
+                        className={`w-7 h-7 rounded-lg text-sm flex items-center justify-center transition cursor-pointer ${
+                          newPersonAvatar === emoji ? 'bg-emerald-100 ring-2 ring-emerald-500' : 'bg-white hover:bg-zinc-100 border border-zinc-200'
+                        }`}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition cursor-pointer shrink-0 ml-auto"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Ekle
+                  </button>
+                </div>
+              </form>
+
+              {/* Kişi Listesi */}
+              <div className="grid grid-cols-1 gap-2">
+                {persons.map(p => (
+                  <div
+                    key={p.id}
+                    className="p-3 rounded-xl border border-zinc-200 flex items-center justify-between gap-2 bg-white hover:border-zinc-300 transition"
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <span className={`w-9 h-9 rounded-xl flex items-center justify-center text-xl shrink-0 border ${p.color || 'bg-zinc-100 text-zinc-700 border-zinc-200'}`}>
+                        {p.avatar}
+                      </span>
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <input
+                          type="text"
+                          value={p.name}
+                          onChange={e => handleUpdatePerson(p.id, 'name', e.target.value)}
+                          className="font-bold text-zinc-900 text-xs w-full bg-transparent hover:bg-zinc-50 focus:bg-white px-1.5 py-0.5 rounded border border-transparent focus:border-zinc-300 outline-none"
+                          placeholder="İsim"
+                        />
+                        <input
+                          type="text"
+                          value={p.role || ''}
+                          onChange={e => handleUpdatePerson(p.id, 'role', e.target.value)}
+                          className="text-[11px] text-zinc-500 w-full bg-transparent hover:bg-zinc-50 focus:bg-white px-1.5 py-0.5 rounded border border-transparent focus:border-zinc-300 outline-none"
+                          placeholder="Rol"
+                        />
+                      </div>
                     </div>
+
+                    {p.id !== 'ortak' && persons.length > 1 && (
+                      <button
+                        onClick={() => handleDeletePerson(p.id)}
+                        className="text-zinc-300 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition cursor-pointer"
+                        title="Kişiyi Sil"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>

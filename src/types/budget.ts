@@ -1,4 +1,4 @@
-export type PersonId = 'tulay' | 'caner' | 'can' | 'ortak' | string;
+export type PersonId = string;
 
 export interface Person {
   id: PersonId;

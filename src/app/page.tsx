@@ -262,7 +262,7 @@ export default function Home() {
         persons={settings.persons}
         categories={settings.categories}
         onAddExpense={handleAddExpense}
-        defaultPersonId={selectedPersonId !== 'all' ? selectedPersonId : 'tulay'}
+        defaultPersonId={selectedPersonId !== 'all' ? selectedPersonId : (settings.persons[0]?.id || 'anne')}
       />
 
       <AddIncomeModal
@@ -270,7 +270,7 @@ export default function Home() {
         onClose={() => setIsAddIncomeOpen(false)}
         persons={settings.persons}
         onAddIncome={handleAddIncome}
-        defaultPersonId="caner"
+        defaultPersonId={settings.persons[1]?.id || settings.persons[0]?.id || 'baba'}
       />
 
       <SettingsModal

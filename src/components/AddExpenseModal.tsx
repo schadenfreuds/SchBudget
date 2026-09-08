@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Person, Category, ExpenseItem, PersonId } from '@/types/budget';
 import { X, Check, CreditCard, Banknote } from 'lucide-react';
 
@@ -19,14 +19,20 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   persons,
   categories,
   onAddExpense,
-  defaultPersonId = 'tulay',
+  defaultPersonId,
 }) => {
   const todayStr = new Date().toISOString().split('T')[0];
 
   const [amount, setAmount] = useState('');
   const [title, setTitle] = useState('');
-  const [selectedPerson, setSelectedPerson] = useState<PersonId>(defaultPersonId);
+  const [selectedPerson, setSelectedPerson] = useState<PersonId>(defaultPersonId || persons[0]?.id || 'ortak');
   const [selectedCategory, setSelectedCategory] = useState<string>('market');
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedPerson(defaultPersonId || persons[0]?.id || 'ortak');
+    }
+  }, [isOpen, defaultPersonId, persons]);
   const [date, setDate] = useState(todayStr);
   const [paymentMethod, setPaymentMethod] = useState<'kredi_karti' | 'nakit'>('kredi_karti');
   const [note, setNote] = useState('');

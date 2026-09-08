@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Person, IncomeItem, PersonId } from '@/types/budget';
 import { X, TrendingUp } from 'lucide-react';
 
@@ -17,13 +17,19 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
   onClose,
   persons,
   onAddIncome,
-  defaultPersonId = 'caner',
+  defaultPersonId,
 }) => {
   const todayStr = new Date().toISOString().split('T')[0];
 
   const [amount, setAmount] = useState('');
   const [title, setTitle] = useState('Maaş');
-  const [selectedPerson, setSelectedPerson] = useState<PersonId>(defaultPersonId);
+  const [selectedPerson, setSelectedPerson] = useState<PersonId>(defaultPersonId || persons[1]?.id || persons[0]?.id || 'baba');
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedPerson(defaultPersonId || persons[1]?.id || persons[0]?.id || 'baba');
+    }
+  }, [isOpen, defaultPersonId, persons]);
   const [date, setDate] = useState(todayStr);
   const [note, setNote] = useState('');
 

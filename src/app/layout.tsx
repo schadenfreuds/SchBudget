@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Aile Bütçesi | Ev Muhasebesi & Gider Takibi",
-  description: "Can, Caner, Tülay ve Ev ortak giderleri için pratik aylık bütçe ve fatura takip sistemi.",
+  description: "Aile ve ev ortak giderleri için sade, pratik aylık bütçe, fatura ve harcama takip sistemi.",
 };
 
 export default function RootLayout({
