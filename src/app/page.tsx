@@ -27,7 +27,7 @@ import { EditExpenseModal } from '@/components/EditExpenseModal';
 import { EditIncomeModal } from '@/components/EditIncomeModal';
 import { EditFixedExpenseModal } from '@/components/EditFixedExpenseModal';
 import { SettingsModal } from '@/components/SettingsModal';
-import { Plus, LayoutDashboard, ReceiptText, CalendarCheck, TrendingUp, Users } from 'lucide-react';
+import { Plus, LayoutDashboard, ReceiptText, CalendarCheck, Users } from 'lucide-react';
 
 export default function Home() {
   const [currentMonth, setCurrentMonth] = useState<string>(() => getMonthKey());
@@ -271,8 +271,6 @@ export default function Home() {
         onMonthChange={setCurrentMonth}
         activeView={currentView}
         onViewChange={setCurrentView}
-        onOpenAddExpense={() => setIsAddExpenseOpen(true)}
-        onOpenAddIncome={() => setIsAddIncomeOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onExportExcel={handleExportExcel}
         isCloudConnected={isCloudConnected}
@@ -308,8 +306,8 @@ export default function Home() {
         {currentView === 'accounting' && (
           <div className="space-y-5">
             
-            {/* Hızlı Filtre & İşlemler Paneli */}
-            <div className="bg-white rounded-xl border border-zinc-200 p-3.5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            {/* Hızlı Filtre Paneli */}
+            <div className="bg-white rounded-xl border border-zinc-200 p-3.5 shadow-xs flex items-center justify-between">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1 mr-1">
                   <Users className="w-3.5 h-3.5 text-zinc-400" /> Kişi:
@@ -338,24 +336,6 @@ export default function Home() {
                     <span>{p.name}</span>
                   </button>
                 ))}
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  onClick={() => setIsAddIncomeOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition cursor-pointer border border-emerald-200"
-                >
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  <span>Gelir Ekle</span>
-                </button>
-
-                <button
-                  onClick={() => setIsAddExpenseOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Harcama Ekle</span>
-                </button>
               </div>
             </div>
 

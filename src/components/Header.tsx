@@ -6,9 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
-  Plus,
   Settings,
-  TrendingUp,
   Cloud,
   CloudOff,
   LayoutDashboard,
@@ -23,8 +21,6 @@ interface HeaderProps {
   onMonthChange: (month: string) => void;
   activeView: AppView;
   onViewChange: (view: AppView) => void;
-  onOpenAddExpense: () => void;
-  onOpenAddIncome: () => void;
   onOpenSettings: () => void;
   onExportExcel: () => void;
   isCloudConnected: boolean;
@@ -35,8 +31,6 @@ export const Header: React.FC<HeaderProps> = ({
   onMonthChange,
   activeView,
   onViewChange,
-  onOpenAddExpense,
-  onOpenAddIncome,
   onOpenSettings,
   onExportExcel,
   isCloudConnected,
@@ -165,27 +159,6 @@ export const Header: React.FC<HeaderProps> = ({
                 <Download className="w-4 h-4 text-zinc-600" />
                 <span className="hidden sm:inline">Excel</span> İndir
               </button>
-            )}
-
-            {/* Muhasebe Görünümündeyse Hızlı Ekleme Butonları */}
-            {activeView === 'accounting' && (
-              <>
-                <button
-                  onClick={onOpenAddIncome}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition cursor-pointer border border-emerald-200"
-                >
-                  <TrendingUp className="w-4 h-4" />
-                  <span className="hidden sm:inline">Gelir Ekle</span>
-                </button>
-
-                <button
-                  onClick={onOpenAddExpense}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Harcama Ekle</span>
-                </button>
-              </>
             )}
 
             {/* Ayarlar Butonu */}
