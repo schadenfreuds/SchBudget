@@ -60,8 +60,8 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           
           {/* Sol: Logo & Bulut Durumu & Sekme Geçişi */}
-          <div className="flex items-center justify-between sm:justify-start gap-3 sm:gap-6 flex-wrap">
-            <div className="flex items-center gap-2.5">
+          <div className="flex items-center justify-between sm:justify-start gap-3 sm:gap-6 shrink-0">
+            <div className="flex items-center gap-2.5 shrink-0">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-bold text-lg shadow-sm">
                 ₺
               </div>
@@ -110,7 +110,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Sağ: Ay Seçici & Aksiyon Butonları */}
-          <div className="flex items-center justify-between sm:justify-end gap-2 flex-wrap">
+          <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
             {/* Ay Değiştirici */}
             <div className="flex items-center bg-zinc-100 rounded-lg p-1 border border-zinc-200">
               <button
@@ -141,15 +141,17 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </div>
 
-            {/* Excel İndir */}
-            <button
-              onClick={onExportExcel}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium text-zinc-700 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition cursor-pointer border border-zinc-200"
-              title="Bu ayın dökümünü Excel dosyası olarak indir"
-            >
-              <Download className="w-4 h-4 text-zinc-600" />
-              <span className="hidden sm:inline">Excel</span> İndir
-            </button>
+            {/* Excel İndir (Yalnızca Anasayfada) */}
+            {activeView === 'dashboard' && (
+              <button
+                onClick={onExportExcel}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium text-zinc-700 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition cursor-pointer border border-zinc-200"
+                title="Bu ayın dökümünü Excel dosyası olarak indir"
+              >
+                <Download className="w-4 h-4 text-zinc-600" />
+                <span className="hidden sm:inline">Excel</span> İndir
+              </button>
+            )}
 
             {/* Muhasebe Görünümündeyse Hızlı Ekleme Butonları */}
             {activeView === 'accounting' && (
