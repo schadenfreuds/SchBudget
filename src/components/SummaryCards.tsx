@@ -1,0 +1,170 @@
+'use client';
+
+import React from 'react';
+import { MonthlyBudget, Person, PersonId } from '@/types/budget';
+import { ArrowDownRight, ArrowUpRight, Wallet, CheckCircle2, Clock } from 'lucide-react';
+
+interface SummaryCardsProps {
+  budget: MonthlyBudget;
+  persons: Person[];
+  selectedPersonId: PersonId | 'all';
+  onSelectPerson: (personId: PersonId | 'all') => void;
+}
+
+export const SummaryCards: React.FC<SummaryCardsProps> = ({
+  budget,
+  persons,
+  selectedPersonId,
+  onSelectPerson,
+}) => {
+  // Hesaplamalar
+  const totalIncome = budget.incomes.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+
+  const fixedPaid = budget.fixedExpenses
+    .filter(f => f.isPaid)
+    .reduce((s, f) => s + (Number(f.actualAmount || f.expectedAmount) || 0), 0);
+
+  const fixedPending = budget.fixedExpenses
+    .filter(f => !f.isPaid)
+    .reduce((s, f) => s + (Number(f.actualAmount || f.expectedAmount) || 0), 0);
+
+  const fixedTotal = fixedPaid + fixedPending;
+
+  const variableTotal = budget.expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+
+  const totalExpense = fixedTotal + variableTotal;
+  const netBalance = totalIncome - totalExpense;
+
+  const formatCurrency = (val: number) => {
+    return val.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' ₺';
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* 3 Ana Finansal Özet Kartı */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        
+        {/* Toplam Gelir */}
+        <div className="bg-white rounded-xl p-4 border border-zinc-200 shadow-xs relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Toplam Gelir</span>
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <ArrowUpRight className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl sm:text-3xl font-bold text-zinc-900">
+            {formatCurrency(totalIncome)}
+          </div>
+          <p className="mt-1 text-xs text-zinc-500">
+            {budget.incomes.length > 0 ? `${budget.incomes.length} gelir kaydı` : 'Henüz gelir girilmedi'}
+          </p>
+        </div>
+
+        {/* Toplam Gider */}
+        <div className="bg-white rounded-xl p-4 border border-zinc-200 shadow-xs relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Toplam Gider</span>
+            <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+              <ArrowDownRight className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl sm:text-3xl font-bold text-zinc-900">
+            {formatCurrency(totalExpense)}
+          </div>
+          <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500">
+            <span>Sabit: {formatCurrency(fixedTotal)}</span>
+            <span>•</span>
+            <span>Günlük: {formatCurrency(variableTotal)}</span>
+          </div>
+        </div>
+
+        {/* Kalan Net Bütçe */}
+        <div className={`rounded-xl p-4 border shadow-xs relative overflow-hidden ${
+          netBalance >= 0 
+            ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-emerald-600' 
+            : 'bg-gradient-to-br from-rose-500 to-red-600 text-white border-rose-600'
+        }`}>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-white/80">Kalan Net Bütçe</span>
+            <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
+              <Wallet className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight">
+            {formatCurrency(netBalance)}
+          </div>
+          <div className="mt-1 flex items-center gap-1.5 text-xs text-white/90">
+            {fixedPending > 0 ? (
+              <span className="flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" /> {formatCurrency(fixedPending)} bekleyen fatura var
+              </span>
+            ) : (
+              <span className="flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5" /> Tüm sabit faturalar ödendi
+              </span>
+            )}
+          </div>
+        </div>
+
+      </div>
+
+      {/* Kişi Bazlı Dağılım Kartları */}
+      <div className="bg-white rounded-xl p-4 border border-zinc-200 shadow-xs">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-zinc-800">Kişi Bazlı Harcamalar</span>
+            <span className="text-xs text-zinc-400 font-normal">(Filtrelemek için tıkla)</span>
+          </div>
+          {selectedPersonId !== 'all' && (
+            <button
+              onClick={() => onSelectPerson('all')}
+              className="text-xs text-emerald-600 font-semibold hover:underline cursor-pointer"
+            >
+              Tümünü Göster
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {persons.map(person => {
+            const pVar = budget.expenses
+              .filter(e => e.personId === person.id)
+              .reduce((s, e) => s + (Number(e.amount) || 0), 0);
+
+            const pFixed = budget.fixedExpenses
+              .filter(f => f.personId === person.id)
+              .reduce((s, f) => s + (Number(f.actualAmount || f.expectedAmount) || 0), 0);
+
+            const pTotal = pVar + pFixed;
+            const isSelected = selectedPersonId === person.id;
+
+            return (
+              <button
+                key={person.id}
+                onClick={() => onSelectPerson(isSelected ? 'all' : person.id)}
+                className={`p-3 rounded-lg border text-left transition cursor-pointer flex flex-col justify-between ${
+                  isSelected
+                    ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-400/30'
+                    : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50/70'
+                }`}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-base">{person.avatar}</span>
+                  <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600">
+                    {person.role || person.name}
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <div className="text-xs font-semibold text-zinc-700 truncate">{person.name}</div>
+                  <div className="text-sm sm:text-base font-bold text-zinc-900 mt-0.5">
+                    {formatCurrency(pTotal)}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
