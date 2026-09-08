@@ -212,7 +212,6 @@ export default function Home() {
         onOpenAddIncome={() => setIsAddIncomeOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onExportExcel={handleExportExcel}
-        onLoadMockup={handleLoadMockup}
         isCloudConnected={isCloudConnected}
       />
 
@@ -395,6 +394,7 @@ export default function Home() {
         onSaveSettings={handleSaveSettings}
         onConnectFirebase={handleConnectFirebase}
         isCloudConnected={isCloudConnected}
+        onLoadMockup={handleLoadMockup}
       />
 
     </div>

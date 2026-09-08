@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { AppSettings, PersonId, Person } from '@/types/budget';
-import { X, Plus, Trash2, Cloud, Check, UserPlus } from 'lucide-react';
+import { X, Plus, Trash2, Cloud, Check, UserPlus, Sparkles, Wrench } from 'lucide-react';
 import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
 
 interface SettingsModalProps {
@@ -12,6 +12,7 @@ interface SettingsModalProps {
   onSaveSettings: (settings: AppSettings) => void;
   onConnectFirebase: (configStr: string) => void;
   isCloudConnected: boolean;
+  onLoadMockup?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -21,8 +22,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onSaveSettings,
   onConnectFirebase,
   isCloudConnected,
+  onLoadMockup,
 }) => {
-  const [activeTab, setActiveTab] = useState<'persons' | 'cloud'>('persons');
+  const [activeTab, setActiveTab] = useState<'persons' | 'cloud' | 'devtools'>('persons');
 
   // Kişiler
   const [persons, setPersons] = useState<Person[]>(settings.persons || []);
@@ -132,6 +134,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }`}
           >
             Bulut (Firebase)
+          </button>
+
+          <button
+            onClick={() => setActiveTab('devtools')}
+            className={`pb-2.5 transition border-b-2 cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'devtools'
+                ? 'border-amber-600 text-amber-700 font-bold'
+                : 'border-transparent text-zinc-500 hover:text-zinc-800'
+            }`}
+          >
+            <Wrench className="w-3.5 h-3.5" />
+            <span>DevTools</span>
           </button>
         </div>
 
@@ -319,6 +333,36 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 >
                   Firebase Bilgilerini Kaydet
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* 3. DevTools / Geliştirici Araçları */}
+          {activeTab === 'devtools' && (
+            <div className="space-y-4 text-xs">
+              <div className="p-4 rounded-xl border border-amber-200 bg-amber-50/70 text-amber-900 space-y-2.5">
+                <div className="font-bold text-sm flex items-center gap-2 text-amber-950">
+                  <Sparkles className="w-4 h-4 text-amber-600" />
+                  Örnek Bütçe Verisi Yükle (Mockup Data)
+                </div>
+                <p className="text-zinc-600 leading-relaxed">
+                  Excel dökümünü, harcama grafiklerini ve kişi dağılımlarını test etmek için mevcut aya 1 aylık gerçekçi örnek veri (3 gelir, 9 fatura, 15 harcama) yükler.
+                </p>
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (onLoadMockup) {
+                        onLoadMockup();
+                        onClose();
+                      }
+                    }}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition shadow-xs cursor-pointer active:scale-95"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>1 Aylık Örnek Veri Yükle</span>
+                  </button>
+                </div>
               </div>
             </div>
           )}

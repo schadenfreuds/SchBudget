@@ -25,7 +25,6 @@ interface HeaderProps {
   onOpenAddIncome: () => void;
   onOpenSettings: () => void;
   onExportExcel: () => void;
-  onLoadMockup?: () => void;
   isCloudConnected: boolean;
 }
 
@@ -38,7 +37,6 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAddIncome,
   onOpenSettings,
   onExportExcel,
-  onLoadMockup,
   isCloudConnected,
 }) => {
   const handlePrevMonth = () => {
@@ -142,18 +140,6 @@ export const Header: React.FC<HeaderProps> = ({
                 Bu Ay
               </button>
             </div>
-
-            {/* Örnek Veri (Demo Butonu) */}
-            {onLoadMockup && (
-              <button
-                onClick={onLoadMockup}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-amber-800 bg-amber-50 hover:bg-amber-100 rounded-lg transition cursor-pointer border border-amber-200"
-                title="Bu aya 1 aylık örnek bütçe verisi yükle"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                <span className="hidden sm:inline">Örnek Veri</span>
-              </button>
-            )}
 
             {/* Excel İndir */}
             <button
