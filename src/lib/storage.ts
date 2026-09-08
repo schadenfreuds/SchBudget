@@ -160,13 +160,14 @@ export function saveLocalMonth(budget: MonthlyBudget): void {
   }
 }
 
-// Bulut ile senkron yükleme
+// Bulut ile senkron yükleme (Maksimum 2.5 saniye zaman aşımlı, asla kilitlenmez)
 export async function loadMonthWithCloud(monthKey: string): Promise<MonthlyBudget> {
   const local = loadLocalMonth(monthKey);
 
   // Arka planda Firebase'den çekip birleştir
   try {
-    const remote = await fetchMonthFromFirebase(monthKey);
+    const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500));
+    const remote = await Promise.race([fetchMonthFromFirebase(monthKey), timeoutPromise]);
     if (remote) {
       saveLocalMonth(remote);
       return remote;

@@ -6,6 +6,7 @@ import {
   getMonthKey,
   loadSettings,
   saveSettings,
+  loadLocalMonth,
   loadMonthWithCloud,
   saveMonthWithCloud,
   saveLocalMonth,
@@ -50,28 +51,38 @@ export default function Home() {
   const [editingIncome, setEditingIncome] = useState<IncomeItem | null>(null);
   const [editingFixedExpense, setEditingFixedExpense] = useState<FixedExpenseItem | null>(null);
 
-  // İlk yükleme ve ay verisi çekme
+  // İlk yükleme ve ay verisi çekme (Anında yerel hafızadan yükler, asla kilitlenmez)
   const fetchMonthData = useCallback(async (monthKey: string) => {
-    const data = await loadMonthWithCloud(monthKey);
-    setBudget(data);
+    // 1. Doğrudan yerel hafızadan anında yükle (0ms bekleme)
+    const local = loadLocalMonth(monthKey);
+    setBudget(local);
+
+    // 2. Arka planda varsa bulut verisiyle güncelle
+    try {
+      const updated = await loadMonthWithCloud(monthKey);
+      if (updated) {
+        setBudget(updated);
+        saveLocalMonth(updated);
+      }
+    } catch {}
   }, []);
 
   useEffect(() => {
-    // Bulut bağlantı kontrolü
+    fetchMonthData(currentMonth);
+
     const db = initFirebase();
     setIsCloudConnected(!!db);
 
-    fetchMonthData(currentMonth);
+    if (db) {
+      const unsubscribe = subscribeToMonth(currentMonth, (updated) => {
+        setBudget(updated);
+        saveLocalMonth(updated);
+      });
 
-    // Eğer Firebase aktifse canlı dinle
-    const unsubscribe = subscribeToMonth(currentMonth, (updated) => {
-      setBudget(updated);
-      saveLocalMonth(updated);
-    });
-
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
+      return () => {
+        if (unsubscribe) unsubscribe();
+      };
+    }
   }, [currentMonth, fetchMonthData]);
 
   // Kaydetme yardımcı fonksiyonu
@@ -361,24 +372,10 @@ export default function Home() {
               </span>
             </div>
 
-            {/* İki Kolonlu Harcama Ekranı: Sol Hızlı Şablonlar, Sağ Harcamalar */}
+            {/* İki Kolonlu Harcama Ekranı: Sol Harcamalar (7 birim), Sağ Hızlı Şablonlar (5 birim) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
               
-              {/* Sol Kolon: Hızlı Şablon Butonları (5 birim) */}
-              <div className="lg:col-span-5">
-                <QuickExpensesCard
-                  settings={settings}
-                  selectedPersonId={selectedPersonId}
-                  onAddExpense={handleAddExpense}
-                  onOpenWithPreset={(preset) => {
-                    setPresetExpense(preset);
-                    setIsAddExpenseOpen(true);
-                  }}
-                  onSaveSettings={handleSaveSettings}
-                />
-              </div>
-
-              {/* Sağ Kolon: Günlük & Değişken Harcamalar (7 birim) */}
+              {/* Sol Kolon: Günlük & Değişken Harcamalar (7 birim) */}
               <div className="lg:col-span-7">
                 <VariableExpensesCard
                   expenses={budget.expenses}
@@ -391,6 +388,20 @@ export default function Home() {
                     setPresetExpense(null);
                     setIsAddExpenseOpen(true);
                   }}
+                />
+              </div>
+
+              {/* Sağ Kolon: Hızlı Şablon Butonları (5 birim) */}
+              <div className="lg:col-span-5">
+                <QuickExpensesCard
+                  settings={settings}
+                  selectedPersonId={selectedPersonId}
+                  onAddExpense={handleAddExpense}
+                  onOpenWithPreset={(preset) => {
+                    setPresetExpense(preset);
+                    setIsAddExpenseOpen(true);
+                  }}
+                  onSaveSettings={handleSaveSettings}
                 />
               </div>
 
