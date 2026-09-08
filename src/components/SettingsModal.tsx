@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { AppSettings, PersonId, Person } from '@/types/budget';
 import { X, Plus, Trash2, Cloud, Check, UserPlus } from 'lucide-react';
+import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -103,7 +104,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       ...templates,
       {
         title: newTitle.trim(),
-        expectedAmount: parseFloat(newAmount) || 0,
+        expectedAmount: parseFormattedAmount(newAmount) || 0,
         categoryId: newCategory,
         personId: newPerson,
         dueDate: parseInt(newDueDate, 10) || 15,
@@ -203,11 +204,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     className="px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white"
                   />
                   <input
-                    type="number"
-                    step="any"
+                    type="text"
+                    inputMode="decimal"
                     placeholder="Standart Tutar (TL)"
                     value={newAmount}
-                    onChange={e => setNewAmount(e.target.value)}
+                    onChange={e => setNewAmount(formatAmountInput(e.target.value))}
                     className="px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white"
                   />
                 </div>

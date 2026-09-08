@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Person, IncomeItem, PersonId } from '@/types/budget';
 import { X, TrendingUp } from 'lucide-react';
+import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
 
 interface AddIncomeModalProps {
   isOpen: boolean;
@@ -37,7 +38,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const parsedAmount = parseFloat(amount);
+    const parsedAmount = parseFormattedAmount(amount);
     if (!parsedAmount || parsedAmount <= 0) return;
 
     onAddIncome({
@@ -83,14 +84,13 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
             </label>
             <div className="relative">
               <input
-                type="number"
-                step="any"
-                min="0.1"
+                type="text"
+                inputMode="decimal"
                 required
                 autoFocus
                 placeholder="0"
                 value={amount}
-                onChange={e => setAmount(e.target.value)}
+                onChange={e => setAmount(formatAmountInput(e.target.value))}
                 className="w-full px-3.5 py-2.5 text-2xl font-bold text-zinc-900 border-2 border-emerald-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400/20"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl font-bold text-zinc-400">

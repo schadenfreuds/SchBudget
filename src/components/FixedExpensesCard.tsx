@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { FixedExpenseItem, Person, Category, PersonId } from '@/types/budget';
 import { Check, Clock, Plus, Trash2, Edit3, Calendar } from 'lucide-react';
+import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
 
 interface FixedExpensesCardProps {
   fixedExpenses: FixedExpenseItem[];
@@ -52,12 +53,13 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
 
   const handleSaveNew = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim() || !newAmount) return;
+    const parsed = parseFormattedAmount(newAmount);
+    if (!newTitle.trim() || parsed <= 0) return;
 
     onAddFixedExpense({
       title: newTitle.trim(),
-      expectedAmount: parseFloat(newAmount) || 0,
-      actualAmount: parseFloat(newAmount) || 0,
+      expectedAmount: parsed,
+      actualAmount: parsed,
       categoryId: newCategory,
       personId: newPerson,
       dueDate: parseInt(newDueDate, 10) || undefined,
@@ -70,11 +72,12 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
 
   const startEditAmount = (item: FixedExpenseItem) => {
     setEditingId(item.id);
-    setEditAmountVal(String(item.actualAmount || item.expectedAmount || ''));
+    const current = item.actualAmount || item.expectedAmount || 0;
+    setEditAmountVal(formatAmountInput(String(current)));
   };
 
   const saveEditAmount = (id: string) => {
-    const val = parseFloat(editAmountVal);
+    const val = parseFormattedAmount(editAmountVal);
     if (!isNaN(val) && val >= 0) {
       onUpdateAmount(id, val);
     }
@@ -129,11 +132,11 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
               className="px-2.5 py-1.5 border border-zinc-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs"
             />
             <input
-              type="number"
-              step="any"
+              type="text"
+              inputMode="decimal"
               placeholder="Beklenen Tutar (TL)"
               value={newAmount}
-              onChange={e => setNewAmount(e.target.value)}
+              onChange={e => setNewAmount(formatAmountInput(e.target.value))}
               required
               className="px-2.5 py-1.5 border border-zinc-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs"
             />
@@ -258,10 +261,15 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                   {editingId === item.id ? (
                     <div className="flex items-center gap-1">
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={editAmountVal}
-                        onChange={e => setEditAmountVal(e.target.value)}
-                        className="w-20 px-1.5 py-0.5 border border-emerald-500 rounded text-xs font-bold text-right"
+                        onChange={e => setEditAmountVal(formatAmountInput(e.target.value))}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') saveEditAmount(item.id);
+                          if (e.key === 'Escape') setEditingId(null);
+                        }}
+                        className="w-24 px-1.5 py-0.5 border border-emerald-500 rounded text-xs font-bold text-right"
                         autoFocus
                       />
                       <button
