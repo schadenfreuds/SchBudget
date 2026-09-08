@@ -105,7 +105,7 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
             </div>
           </div>
 
-          {/* Harcayan Kişi (Anne, Baba, Can, Ortak) */}
+          {/* Harcayan Kişi (Anne, Baba, Çocuk, Ortak) */}
           <div>
             <label className="block text-xs font-semibold text-zinc-600 mb-1.5">
               Harcamayı Yapan Kişi *

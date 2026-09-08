@@ -300,7 +300,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <input
                     type="text"
-                    placeholder="İsim (ör. Can, Tülay, Ayşe...)"
+                    placeholder="İsim (ör. Ahmet, Ayşe, Mehmet...)"
                     value={newPersonName}
                     onChange={e => setNewPersonName(e.target.value)}
                     required
