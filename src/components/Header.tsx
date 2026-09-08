@@ -11,16 +11,18 @@ import {
   TrendingUp,
   Cloud,
   CloudOff,
-  Sparkles,
   LayoutDashboard,
   ReceiptText,
+  CalendarCheck,
 } from 'lucide-react';
+
+export type AppView = 'dashboard' | 'accounting' | 'bills';
 
 interface HeaderProps {
   currentMonth: string;
   onMonthChange: (month: string) => void;
-  activeView: 'dashboard' | 'accounting';
-  onViewChange: (view: 'dashboard' | 'accounting') => void;
+  activeView: AppView;
+  onViewChange: (view: AppView) => void;
   onOpenAddExpense: () => void;
   onOpenAddIncome: () => void;
   onOpenSettings: () => void;
@@ -81,7 +83,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
 
-            {/* Sayfa Geçiş Sekmeleri (Anasayfa / Muhasebe) */}
+            {/* Sayfa Geçiş Sekmeleri (Anasayfa / Muhasebe / Faturalar) */}
             <nav className="flex items-center bg-zinc-100 p-1 rounded-xl border border-zinc-200">
               <button
                 onClick={() => onViewChange('dashboard')}
@@ -105,6 +107,18 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <ReceiptText className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Muhasebe</span>
+              </button>
+
+              <button
+                onClick={() => onViewChange('bills')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                  activeView === 'bills'
+                    ? 'bg-white text-emerald-700 shadow-xs'
+                    : 'text-zinc-600 hover:text-zinc-900'
+                }`}
+              >
+                <CalendarCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Faturalar</span>
               </button>
             </nav>
           </div>

@@ -14,9 +14,10 @@ import {
 import { initFirebase, subscribeToMonth } from '@/lib/firebase';
 import { exportBudgetToExcel } from '@/lib/excelExport';
 
-import { Header } from '@/components/Header';
+import { Header, AppView } from '@/components/Header';
 import { SummaryCards } from '@/components/SummaryCards';
 import { FixedExpensesCard } from '@/components/FixedExpensesCard';
+import { FixedExpenseTemplatesCard } from '@/components/FixedExpenseTemplatesCard';
 import { VariableExpensesCard } from '@/components/VariableExpensesCard';
 import { CategoryBreakdown } from '@/components/CategoryBreakdown';
 import { IncomesCard } from '@/components/IncomesCard';
@@ -26,7 +27,7 @@ import { EditExpenseModal } from '@/components/EditExpenseModal';
 import { EditIncomeModal } from '@/components/EditIncomeModal';
 import { EditFixedExpenseModal } from '@/components/EditFixedExpenseModal';
 import { SettingsModal } from '@/components/SettingsModal';
-import { Plus, LayoutDashboard, ReceiptText, TrendingUp, Users } from 'lucide-react';
+import { Plus, LayoutDashboard, ReceiptText, CalendarCheck, TrendingUp, Users } from 'lucide-react';
 
 export default function Home() {
   const [currentMonth, setCurrentMonth] = useState<string>(() => getMonthKey());
@@ -34,7 +35,7 @@ export default function Home() {
   const [budget, setBudget] = useState<MonthlyBudget | null>(null);
   const [selectedPersonId, setSelectedPersonId] = useState<PersonId | 'all'>('all');
   const [isCloudConnected, setIsCloudConnected] = useState<boolean>(false);
-  const [currentView, setCurrentView] = useState<'dashboard' | 'accounting'>('dashboard');
+  const [currentView, setCurrentView] = useState<AppView>('dashboard');
 
   // Ekleme Modalları
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState<boolean>(false);
@@ -124,6 +125,36 @@ export default function Home() {
     updateBudget(prev => ({
       ...prev,
       fixedExpenses: [...prev.fixedExpenses, newItem],
+    }));
+  };
+
+  // 4.5 Şablondaki Eksik Faturaları Mevcut Aya Aktar
+  const handleSyncTemplatesToCurrentMonth = () => {
+    if (!budget) return;
+    const existingTitles = new Set(budget.fixedExpenses.map(f => f.title.toLowerCase().trim()));
+    const missing = (settings.defaultFixedExpenses || []).filter(
+      tpl => !existingTitles.has(tpl.title.toLowerCase().trim())
+    );
+
+    if (missing.length === 0) {
+      alert('Şablondaki tüm faturalar zaten bu aya eklenmiş durumda.');
+      return;
+    }
+
+    const newItems: FixedExpenseItem[] = missing.map((tpl, i) => ({
+      id: `fixed_${currentMonth}_sync_${Date.now()}_${i}`,
+      title: tpl.title,
+      expectedAmount: tpl.expectedAmount,
+      actualAmount: tpl.expectedAmount,
+      categoryId: tpl.categoryId,
+      personId: tpl.personId,
+      dueDate: tpl.dueDate,
+      isPaid: false,
+    }));
+
+    updateBudget(prev => ({
+      ...prev,
+      fixedExpenses: [...prev.fixedExpenses, ...newItems],
     }));
   };
 
@@ -250,10 +281,11 @@ export default function Home() {
       {/* Ana Gövde */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
         
+        {/* ======================================================== */}
         {/* 1. ANASAYFA GÖRÜNÜMÜ: Özet, Ödeme Kanalları, Kişi Harcamaları, Kategori Dağılımı */}
+        {/* ======================================================== */}
         {currentView === 'dashboard' && (
           <div className="space-y-5">
-            {/* Toplam Gelir, Gider, Net Bütçe, Kredi Kartı/Nakit Dağılımı ve Kişi Bazlı Harcamalar */}
             <SummaryCards
               budget={budget}
               persons={settings.persons}
@@ -261,7 +293,6 @@ export default function Home() {
               onSelectPerson={setSelectedPersonId}
             />
 
-            {/* Nereye Ne Kadar Harcadık? (Kategori Dağılımı) */}
             <CategoryBreakdown
               budget={budget}
               categories={settings.categories}
@@ -271,7 +302,9 @@ export default function Home() {
           </div>
         )}
 
-        {/* 2. MUHASEBE GÖRÜNÜMÜ: Fatura ve Harcama İşlemleri, Girişler ve Dökümler */}
+        {/* ======================================================== */}
+        {/* 2. MUHASEBE GÖRÜNÜMÜ: Gelirler & Günlük Harcamalar (Ferah İki Kolon) */}
+        {/* ======================================================== */}
         {currentView === 'accounting' && (
           <div className="space-y-5">
             
@@ -326,23 +359,11 @@ export default function Home() {
               </div>
             </div>
 
-            {/* İki Kolonlu Muhasebe Tablosu */}
+            {/* İki Kolonlu Muhasebe Tablosu: Sol Gelirler, Sağ Harcamalar */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
               
-              {/* Sol Kolon: Sabit Giderler & Faturalar + Gelirler (5 birim) */}
-              <div className="lg:col-span-5 space-y-5">
-                <FixedExpensesCard
-                  fixedExpenses={budget.fixedExpenses}
-                  persons={settings.persons}
-                  categories={settings.categories}
-                  selectedPersonId={selectedPersonId}
-                  onTogglePaid={handleTogglePaid}
-                  onUpdateAmount={handleUpdateFixedAmount}
-                  onDeleteExpense={handleDeleteFixedExpense}
-                  onAddFixedExpense={handleAddFixedExpense}
-                  onEditFixedExpense={(item) => setEditingFixedExpense(item)}
-                />
-
+              {/* Sol Kolon: Gelirler (5 birim) - Artık doğrudan tepede, asla altta kalmıyor! */}
+              <div className="lg:col-span-5">
                 <IncomesCard
                   incomes={budget.incomes}
                   persons={settings.persons}
@@ -371,9 +392,82 @@ export default function Home() {
           </div>
         )}
 
+        {/* ======================================================== */}
+        {/* 3. FATURALAR GÖRÜNÜMÜ: Bu Ayın Sabit Giderleri + Rutin Şablonlar */}
+        {/* ======================================================== */}
+        {currentView === 'bills' && (
+          <div className="space-y-5">
+            
+            {/* Hızlı Kişi Filtresi */}
+            <div className="bg-white rounded-xl border border-zinc-200 p-3.5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1 mr-1">
+                  <Users className="w-3.5 h-3.5 text-zinc-400" /> Kişi:
+                </span>
+                <button
+                  onClick={() => setSelectedPersonId('all')}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                    selectedPersonId === 'all'
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                  }`}
+                >
+                  Tümü
+                </button>
+                {settings.persons.map(p => (
+                  <button
+                    key={p.id}
+                    onClick={() => setSelectedPersonId(selectedPersonId === p.id ? 'all' : p.id)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+                      selectedPersonId === p.id
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                    }`}
+                  >
+                    <span>{p.avatar}</span>
+                    <span>{p.name}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="text-xs text-zinc-500 font-medium">
+                Bu ayki faturalarınızı tikleyin veya sağ taraftan kalıcı şablonlarınızı yönetin.
+              </div>
+            </div>
+
+            {/* İki Kolon: Sol Bu Ayın Faturaları (7 birim), Sağ Rutin Fatura Şablonları (5 birim) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              
+              <div className="lg:col-span-7">
+                <FixedExpensesCard
+                  fixedExpenses={budget.fixedExpenses}
+                  persons={settings.persons}
+                  categories={settings.categories}
+                  selectedPersonId={selectedPersonId}
+                  onTogglePaid={handleTogglePaid}
+                  onUpdateAmount={handleUpdateFixedAmount}
+                  onDeleteExpense={handleDeleteFixedExpense}
+                  onAddFixedExpense={handleAddFixedExpense}
+                  onEditFixedExpense={(item) => setEditingFixedExpense(item)}
+                />
+              </div>
+
+              <div className="lg:col-span-5">
+                <FixedExpenseTemplatesCard
+                  settings={settings}
+                  onSaveSettings={handleSaveSettings}
+                  onSyncMissingTemplatesToCurrentMonth={handleSyncTemplatesToCurrentMonth}
+                />
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
       </main>
 
-      {/* Mobil İçin Alt Gezinti Çubuğu (Bottom Navigation Bar) */}
+      {/* Mobil İçin Alt Gezinti Çubuğu (Bottom Navigation Bar - 3 Sekmeli) */}
       <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-200 px-4 py-2 flex items-center justify-around shadow-lg">
         <button
           onClick={() => setCurrentView('dashboard')}
@@ -386,14 +480,6 @@ export default function Home() {
         </button>
 
         <button
-          onClick={() => setIsAddExpenseOpen(true)}
-          className="w-12 h-12 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-md flex items-center justify-center transition active:scale-95 cursor-pointer -mt-5 border-4 border-white"
-          aria-label="Harcama Ekle"
-        >
-          <Plus className="w-6 h-6 stroke-[2.5]" />
-        </button>
-
-        <button
           onClick={() => setCurrentView('accounting')}
           className={`flex flex-col items-center gap-0.5 text-[11px] font-semibold transition cursor-pointer ${
             currentView === 'accounting' ? 'text-emerald-600 font-bold' : 'text-zinc-500'
@@ -401,6 +487,24 @@ export default function Home() {
         >
           <ReceiptText className="w-5 h-5" />
           <span>Muhasebe</span>
+        </button>
+
+        <button
+          onClick={() => setIsAddExpenseOpen(true)}
+          className="w-11 h-11 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-md flex items-center justify-center transition active:scale-95 cursor-pointer -mt-4 border-2 border-white"
+          aria-label="Harcama Ekle"
+        >
+          <Plus className="w-5 h-5 stroke-[2.5]" />
+        </button>
+
+        <button
+          onClick={() => setCurrentView('bills')}
+          className={`flex flex-col items-center gap-0.5 text-[11px] font-semibold transition cursor-pointer ${
+            currentView === 'bills' ? 'text-emerald-600 font-bold' : 'text-zinc-500'
+          }`}
+        >
+          <CalendarCheck className="w-5 h-5" />
+          <span>Faturalar</span>
         </button>
       </div>
 
