@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { MonthlyBudget, Person, PersonId } from '@/types/budget';
-import { ArrowDownRight, ArrowUpRight, Wallet, CheckCircle2, Clock } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Wallet, CheckCircle2, Clock, CreditCard, Banknote } from 'lucide-react';
 
 interface SummaryCardsProps {
   budget: MonthlyBudget;
@@ -34,6 +34,18 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
 
   const totalExpense = fixedTotal + variableTotal;
   const netBalance = totalIncome - totalExpense;
+
+  // Kredi Kartı vs Nakit Ayrımı
+  const creditCardTotal = budget.expenses
+    .filter(e => (e.paymentMethod || 'kredi_karti') === 'kredi_karti')
+    .reduce((s, e) => s + (Number(e.amount) || 0), 0);
+
+  const cashTotal = budget.expenses
+    .filter(e => e.paymentMethod === 'nakit' || e.paymentMethod === 'havale')
+    .reduce((s, e) => s + (Number(e.amount) || 0), 0);
+
+  const cardPct = variableTotal > 0 ? Math.round((creditCardTotal / variableTotal) * 100) : 0;
+  const cashPct = variableTotal > 0 ? 100 - cardPct : 0;
 
   const formatCurrency = (val: number) => {
     return val.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' ₺';
@@ -107,6 +119,45 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
         </div>
 
       </div>
+
+      {/* Kredi Kartı vs. Nakit Harcama Dağılım Şeridi */}
+      {variableTotal > 0 && (
+        <div className="bg-white rounded-xl p-3.5 border border-zinc-200 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <CreditCard className="w-3.5 h-3.5" />
+              </div>
+              <span className="text-xs font-bold text-zinc-800 uppercase tracking-wide">
+                Harcama Ödeme Kanalları
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 text-xs font-medium">
+              <span className="text-indigo-700 flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block" />
+                Kredi Kartı Ekstresi: <strong className="font-bold">{formatCurrency(creditCardTotal)}</strong> ({cardPct}%)
+              </span>
+              <span className="text-emerald-700 flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+                Nakit / Banka: <strong className="font-bold">{formatCurrency(cashTotal)}</strong> ({cashPct}%)
+              </span>
+            </div>
+          </div>
+          {/* Progress Bar */}
+          <div className="w-full bg-zinc-100 rounded-full h-2 overflow-hidden flex">
+            <div
+              className="bg-indigo-500 h-2 transition-all duration-300"
+              style={{ width: `${cardPct}%` }}
+              title={`Kredi Kartı: %${cardPct}`}
+            />
+            <div
+              className="bg-emerald-500 h-2 transition-all duration-300"
+              style={{ width: `${cashPct}%` }}
+              title={`Nakit / Banka: %${cashPct}`}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Kişi Bazlı Dağılım Kartları */}
       <div className="bg-white rounded-xl p-4 border border-zinc-200 shadow-xs">

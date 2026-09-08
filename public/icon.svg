@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Arka Plan -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+
+  <!-- İç Panel / Çatı & Ev Silüeti -->
+  <g filter="url(#shadow)" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Ev Çatısı -->
+    <path d="M 120 230 L 256 120 L 392 230" />
+    <!-- Ev Gövdesi -->
+    <path d="M 160 210 L 160 380 Q 160 400 180 400 L 332 400 Q 352 400 352 380 L 352 210" />
+  </g>
+
+  <!-- Cüzdan / Para Simgesi -->
+  <g filter="url(#shadow)">
+    <!-- Para / Altın Rozet -->
+    <circle cx="256" cy="305" r="54" fill="url(#goldGrad)" stroke="#ffffff" stroke-width="8" />
+    <!-- TL Simgesi veya Kalp/Onay -->
+    <text x="256" y="324" font-size="44" font-family="system-ui, -apple-system, sans-serif" font-weight="900" fill="#78350f" text-anchor="middle">₺</text>
+  </g>
+</svg>

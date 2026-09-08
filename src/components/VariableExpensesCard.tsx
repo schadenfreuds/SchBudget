@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ExpenseItem, Person, Category, PersonId } from '@/types/budget';
-import { Search, Trash2, CreditCard, Banknote, ShoppingBag } from 'lucide-react';
+import { Search, Trash2, CreditCard, Banknote, ShoppingBag, Edit2 } from 'lucide-react';
 
 interface VariableExpensesCardProps {
   expenses: ExpenseItem[];
@@ -10,6 +10,7 @@ interface VariableExpensesCardProps {
   categories: Category[];
   selectedPersonId: PersonId | 'all';
   onDeleteExpense: (id: string) => void;
+  onEditExpense: (expense: ExpenseItem) => void;
   onOpenAddExpense: () => void;
 }
 
@@ -19,16 +20,22 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
   categories,
   selectedPersonId,
   onDeleteExpense,
+  onEditExpense,
   onOpenAddExpense,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [paymentFilter, setPaymentFilter] = useState<'all' | 'kredi_karti' | 'nakit'>('all');
 
   // Filtreleme
   const filtered = expenses
     .filter(e => {
       if (selectedPersonId !== 'all' && e.personId !== selectedPersonId) return false;
       if (selectedCategory !== 'all' && e.categoryId !== selectedCategory) return false;
+      if (paymentFilter !== 'all') {
+        const method = e.paymentMethod || 'kredi_karti';
+        if (method !== paymentFilter) return false;
+      }
       if (searchTerm.trim()) {
         const term = searchTerm.toLowerCase();
         const matchTitle = e.title.toLowerCase().includes(term);
@@ -79,7 +86,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
           </button>
         </div>
 
-        {/* Arama ve Kategori Filtresi */}
+        {/* Arama, Kategori ve Ödeme Yöntemi Filtresi */}
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
             <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400" />
@@ -92,16 +99,28 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
             />
           </div>
 
-          <select
-            value={selectedCategory}
-            onChange={e => setSelectedCategory(e.target.value)}
-            className="px-2.5 py-1.5 text-xs bg-white border border-zinc-300 rounded-lg text-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          >
-            <option value="all">Tüm Kategoriler</option>
-            {categories.map(c => (
-              <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-1.5">
+            <select
+              value={selectedCategory}
+              onChange={e => setSelectedCategory(e.target.value)}
+              className="px-2.5 py-1.5 text-xs bg-white border border-zinc-300 rounded-lg text-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            >
+              <option value="all">Tüm Kategoriler</option>
+              {categories.map(c => (
+                <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+              ))}
+            </select>
+
+            <select
+              value={paymentFilter}
+              onChange={e => setPaymentFilter(e.target.value as 'all' | 'kredi_karti' | 'nakit')}
+              className="px-2.5 py-1.5 text-xs bg-white border border-zinc-300 rounded-lg text-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            >
+              <option value="all">💳/💵 Tümü</option>
+              <option value="kredi_karti">💳 Kredi Kartı</option>
+              <option value="nakit">💵 Nakit / Banka</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -128,7 +147,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
             return (
               <div
                 key={expense.id}
-                className="p-3 rounded-lg flex items-center justify-between gap-3 hover:bg-zinc-50 transition"
+                className="p-3 rounded-lg flex items-center justify-between gap-3 hover:bg-zinc-50 transition group"
               >
                 {/* Sol: İkon + Başlık + Kişi + Tarih */}
                 <div className="flex items-center gap-3 min-w-0">
@@ -168,9 +187,13 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
                           <span>•</span>
                           <span className="inline-flex items-center gap-0.5 text-zinc-400">
                             {expense.paymentMethod === 'kredi_karti' ? (
-                              <CreditCard className="w-3 h-3" />
+                              <span className="flex items-center gap-0.5 text-indigo-600 bg-indigo-50 px-1 rounded text-[10px] font-medium">
+                                <CreditCard className="w-3 h-3" /> Kart
+                              </span>
                             ) : (
-                              <Banknote className="w-3 h-3" />
+                              <span className="flex items-center gap-0.5 text-emerald-600 bg-emerald-50 px-1 rounded text-[10px] font-medium">
+                                <Banknote className="w-3 h-3" /> Nakit
+                              </span>
                             )}
                           </span>
                         </>
@@ -179,19 +202,29 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
                   </div>
                 </div>
 
-                {/* Sağ: Tutar + Sil butonu */}
-                <div className="flex items-center gap-2.5 shrink-0">
+                {/* Sağ: Tutar + Düzenle & Sil butonları */}
+                <div className="flex items-center gap-2 shrink-0">
                   <span className="text-sm font-bold text-zinc-900">
                     {Number(expense.amount).toLocaleString('tr-TR')} ₺
                   </span>
 
-                  <button
-                    onClick={() => onDeleteExpense(expense.id)}
-                    className="text-zinc-300 hover:text-rose-500 transition p-1 cursor-pointer"
-                    title="Harcamayı sil"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => onEditExpense(expense)}
+                      className="text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 p-1 rounded-md transition cursor-pointer"
+                      title="Harcamayı düzenle"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      onClick={() => onDeleteExpense(expense.id)}
+                      className="text-zinc-300 hover:text-rose-500 hover:bg-rose-50 p-1 rounded-md transition cursor-pointer"
+                      title="Harcamayı sil"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );

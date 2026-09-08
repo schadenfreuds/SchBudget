@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { FixedExpenseItem, Person, Category, PersonId } from '@/types/budget';
-import { Check, Clock, Plus, Trash2, Edit3, Calendar } from 'lucide-react';
+import { Check, Clock, Plus, Trash2, Edit3, Calendar, Edit2 } from 'lucide-react';
 import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
 
 interface FixedExpensesCardProps {
@@ -14,6 +14,7 @@ interface FixedExpensesCardProps {
   onUpdateAmount: (id: string, newAmount: number) => void;
   onDeleteExpense: (id: string) => void;
   onAddFixedExpense: (item: Omit<FixedExpenseItem, 'id' | 'isPaid'>) => void;
+  onEditFixedExpense: (item: FixedExpenseItem) => void;
 }
 
 export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
@@ -25,6 +26,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
   onUpdateAmount,
   onDeleteExpense,
   onAddFixedExpense,
+  onEditFixedExpense,
 }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -85,6 +87,52 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
     setEditingId(null);
   };
 
+  const renderDueDateBadge = (item: FixedExpenseItem) => {
+    if (item.isPaid) {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+          ✓ Ödendi
+        </span>
+      );
+    }
+    if (!item.dueDate) {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+          <Clock className="w-2.5 h-2.5" /> Bekliyor
+        </span>
+      );
+    }
+
+    const today = new Date().getDate();
+    const diff = item.dueDate - today;
+
+    if (diff < 0) {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-300">
+          🚨 {Math.abs(diff)} gün gecikti!
+        </span>
+      );
+    } else if (diff === 0) {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
+          ⚠️ Bugün son gün!
+        </span>
+      );
+    } else if (diff <= 3) {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+          ⏳ {diff} gün kaldı
+        </span>
+      );
+    } else {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-full border border-zinc-200">
+          🗓️ Ayın {item.dueDate}&apos;si
+        </span>
+      );
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl border border-zinc-200 shadow-xs overflow-hidden flex flex-col h-full">
       
@@ -104,7 +152,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
 
         <button
           onClick={() => setIsAdding(!isAdding)}
-          className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-white border border-zinc-300 text-zinc-700 hover:bg-zinc-50 transition cursor-pointer"
+          className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-white border border-zinc-300 text-zinc-700 hover:bg-zinc-50 transition cursor-pointer shadow-xs"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>Fatura Ekle</span>
@@ -235,7 +283,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
             return (
               <div
                 key={item.id}
-                className={`p-3 rounded-lg flex items-center justify-between gap-3 transition ${
+                className={`p-3 rounded-lg flex items-center justify-between gap-3 transition group ${
                   item.isPaid ? 'bg-emerald-50/40 hover:bg-emerald-50/70' : 'hover:bg-zinc-50'
                 }`}
               >
@@ -272,11 +320,11 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                           <span className="text-zinc-600">{person.name}</span>
                         </span>
                       )}
-                      {item.dueDate && (
+                      {item.note && (
                         <>
                           <span>•</span>
-                          <span className="inline-flex items-center gap-0.5 text-zinc-500">
-                            <Calendar className="w-3 h-3" /> Ayın {item.dueDate}&apos;si
+                          <span className="text-zinc-400 italic truncate max-w-[120px]">
+                            {item.note}
                           </span>
                         </>
                       )}
@@ -284,7 +332,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                   </div>
                 </div>
 
-                {/* Sağ: Tutar + Durum + Silme */}
+                {/* Sağ: Tutar + Durum + Düzenle & Sil */}
                 <div className="flex items-center gap-2.5 shrink-0">
                   {editingId === item.id ? (
                     <div className="flex items-center gap-1">
@@ -310,7 +358,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                   ) : (
                     <button
                       onClick={() => startEditAmount(item)}
-                      title="Tutarı değiştirmek için tıkla"
+                      title="Tutarı hızlıca değiştirmek için tıkla"
                       className="group/btn flex items-center gap-1 text-right cursor-pointer"
                     >
                       <span className={`text-sm font-bold ${item.isPaid ? 'text-zinc-600' : 'text-zinc-900'}`}>
@@ -320,29 +368,27 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                     </button>
                   )}
 
-                  <span
-                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${
-                      item.isPaid
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-amber-100 text-amber-800'
-                    }`}
-                  >
-                    {item.isPaid ? (
-                      <>Ödendi</>
-                    ) : (
-                      <>
-                        <Clock className="w-2.5 h-2.5" /> Bekliyor
-                      </>
-                    )}
-                  </span>
+                  {/* Akıllı Vade Rozeti */}
+                  {renderDueDateBadge(item)}
 
-                  <button
-                    onClick={() => onDeleteExpense(item.id)}
-                    className="text-zinc-300 hover:text-rose-500 transition p-1 cursor-pointer"
-                    title="Bu sabit gideri sil"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  {/* Düzenleme ve Silme Butonları */}
+                  <div className="flex items-center gap-0.5">
+                    <button
+                      onClick={() => onEditFixedExpense(item)}
+                      className="text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 p-1 rounded-md transition cursor-pointer"
+                      title="Faturayı detaylı düzenle"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      onClick={() => onDeleteExpense(item.id)}
+                      className="text-zinc-300 hover:text-rose-500 hover:bg-rose-50 p-1 rounded-md transition cursor-pointer"
+                      title="Bu sabit gideri sil"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );

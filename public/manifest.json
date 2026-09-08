@@ -1,0 +1,18 @@
+{
+  "name": "Aile Bütçesi & Ev Muhasebesi",
+  "short_name": "Aile Bütçesi",
+  "description": "Aile ve ev ortak giderleri için pratik bütçe, fatura ve harcama takip sistemi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f4f5",
+  "theme_color": "#059669",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

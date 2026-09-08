@@ -22,6 +22,9 @@ import { CategoryBreakdown } from '@/components/CategoryBreakdown';
 import { IncomesCard } from '@/components/IncomesCard';
 import { AddExpenseModal } from '@/components/AddExpenseModal';
 import { AddIncomeModal } from '@/components/AddIncomeModal';
+import { EditExpenseModal } from '@/components/EditExpenseModal';
+import { EditIncomeModal } from '@/components/EditIncomeModal';
+import { EditFixedExpenseModal } from '@/components/EditFixedExpenseModal';
 import { SettingsModal } from '@/components/SettingsModal';
 import { Plus, LayoutDashboard, ReceiptText, TrendingUp, Users } from 'lucide-react';
 
@@ -33,25 +36,30 @@ export default function Home() {
   const [isCloudConnected, setIsCloudConnected] = useState<boolean>(false);
   const [currentView, setCurrentView] = useState<'dashboard' | 'accounting'>('dashboard');
 
-  // Modallar
+  // Ekleme Modalları
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState<boolean>(false);
   const [isAddIncomeOpen, setIsAddIncomeOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
-  // Ilk yukleme ve ay verisi cekme
+  // Düzenleme Modalları
+  const [editingExpense, setEditingExpense] = useState<ExpenseItem | null>(null);
+  const [editingIncome, setEditingIncome] = useState<IncomeItem | null>(null);
+  const [editingFixedExpense, setEditingFixedExpense] = useState<FixedExpenseItem | null>(null);
+
+  // İlk yükleme ve ay verisi çekme
   const fetchMonthData = useCallback(async (monthKey: string) => {
     const data = await loadMonthWithCloud(monthKey);
     setBudget(data);
   }, []);
 
   useEffect(() => {
-    // Bulut baglanti kontrolu
+    // Bulut bağlantı kontrolü
     const db = initFirebase();
     setIsCloudConnected(!!db);
 
     fetchMonthData(currentMonth);
 
-    // Eger Firebase aktifse canli dinle
+    // Eğer Firebase aktifse canlı dinle
     const unsubscribe = subscribeToMonth(currentMonth, (updated) => {
       setBudget(updated);
       saveLocalMonth(updated);
@@ -62,7 +70,7 @@ export default function Home() {
     };
   }, [currentMonth, fetchMonthData]);
 
-  // Kaydetme yardimci fonksiyonu
+  // Kaydetme yardımcı fonksiyonu
   const updateBudget = (updater: (prev: MonthlyBudget) => MonthlyBudget) => {
     if (!budget) return;
     const newBudget = updater(budget);
@@ -70,7 +78,7 @@ export default function Home() {
     saveMonthWithCloud(newBudget);
   };
 
-  // 1. Sabit Gider Odendi / Bekliyor Degistir
+  // 1. Sabit Gider Ödendi / Bekliyor Değiştir
   const handleTogglePaid = (id: string) => {
     updateBudget(prev => ({
       ...prev,
@@ -80,13 +88,21 @@ export default function Home() {
     }));
   };
 
-  // 2. Sabit Gider Tutarini Guncelle
+  // 2. Sabit Gider Tutarını Güncelle (Hızlı Inline)
   const handleUpdateFixedAmount = (id: string, newAmount: number) => {
     updateBudget(prev => ({
       ...prev,
       fixedExpenses: prev.fixedExpenses.map(f =>
         f.id === id ? { ...f, actualAmount: newAmount } : f
       ),
+    }));
+  };
+
+  // 2.5 Sabit Gideri Detaylı Güncelle (Modal)
+  const handleSaveFixedExpense = (updatedItem: FixedExpenseItem) => {
+    updateBudget(prev => ({
+      ...prev,
+      fixedExpenses: prev.fixedExpenses.map(f => f.id === updatedItem.id ? updatedItem : f),
     }));
   };
 
@@ -111,7 +127,7 @@ export default function Home() {
     }));
   };
 
-  // 5. Degisken Harcama Ekle
+  // 5. Değişken Harcama Ekle
   const handleAddExpense = (expense: Omit<ExpenseItem, 'id' | 'createdAt'>) => {
     const newItem: ExpenseItem = {
       ...expense,
@@ -124,7 +140,15 @@ export default function Home() {
     }));
   };
 
-  // 6. Degisken Harcama Sil
+  // 5.5 Değişken Harcama Güncelle
+  const handleSaveExpense = (updatedExpense: ExpenseItem) => {
+    updateBudget(prev => ({
+      ...prev,
+      expenses: prev.expenses.map(e => e.id === updatedExpense.id ? updatedExpense : e),
+    }));
+  };
+
+  // 6. Değişken Harcama Sil
   const handleDeleteExpense = (id: string) => {
     updateBudget(prev => ({
       ...prev,
@@ -144,6 +168,14 @@ export default function Home() {
     }));
   };
 
+  // 7.2 Gelir Güncelle
+  const handleSaveIncome = (updatedIncome: IncomeItem) => {
+    updateBudget(prev => ({
+      ...prev,
+      incomes: prev.incomes.map(i => i.id === updatedIncome.id ? updatedIncome : i),
+    }));
+  };
+
   // 7.5 Gelir Sil
   const handleDeleteIncome = (id: string) => {
     updateBudget(prev => ({
@@ -152,13 +184,13 @@ export default function Home() {
     }));
   };
 
-  // 8. Excel Indir
+  // 8. Excel İndir
   const handleExportExcel = () => {
     if (!budget) return;
     exportBudgetToExcel(budget, settings);
   };
 
-  // 8.5 Ornek Demo Verisi Yukle
+  // 8.5 Örnek Demo Verisi Yükle
   const handleLoadMockup = () => {
     if (confirm('Mevcut aya 1 aylık gerçekçi örnek bütçe ve harcama verileri yüklensin mi?')) {
       const mock = getMockupMonthBudget(currentMonth);
@@ -167,13 +199,13 @@ export default function Home() {
     }
   };
 
-  // 9. Ayarlari Kaydet
+  // 9. Ayarları Kaydet
   const handleSaveSettings = (newSettings: AppSettings) => {
     setSettingsState(newSettings);
     saveSettings(newSettings);
   };
 
-  // 10. Firebase Baglantisi
+  // 10. Firebase Bağlantısı
   const handleConnectFirebase = (configStr: string) => {
     try {
       const parsed = JSON.parse(configStr);
@@ -183,7 +215,7 @@ export default function Home() {
       if (budget) {
         saveMonthWithCloud(budget);
       }
-    } catch (err) {
+    } catch {
       alert('Firebase yapılandırma formatı geçersiz. Lütfen geçerli bir JSON girin.');
     }
   };
@@ -202,7 +234,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-100 text-zinc-900 pb-24 sm:pb-12">
       
-      {/* Ust Cubuk & Menu */}
+      {/* Üst Çubuk & Menü */}
       <Header
         currentMonth={currentMonth}
         onMonthChange={setCurrentMonth}
@@ -215,13 +247,13 @@ export default function Home() {
         isCloudConnected={isCloudConnected}
       />
 
-      {/* Ana Govde */}
+      {/* Ana Gövde */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
         
-        {/* 1. ANASAYFA GORUNUMU: Ozet, Kisi Harcamalari, Nereye Ne Kadar Harcadik */}
+        {/* 1. ANASAYFA GÖRÜNÜMÜ: Özet, Ödeme Kanalları, Kişi Harcamaları, Kategori Dağılımı */}
         {currentView === 'dashboard' && (
           <div className="space-y-5">
-            {/* Toplam Gelir, Gider, Net Butce ve Kisi Bazli Harcamalar */}
+            {/* Toplam Gelir, Gider, Net Bütçe, Kredi Kartı/Nakit Dağılımı ve Kişi Bazlı Harcamalar */}
             <SummaryCards
               budget={budget}
               persons={settings.persons}
@@ -229,7 +261,7 @@ export default function Home() {
               onSelectPerson={setSelectedPersonId}
             />
 
-            {/* Nereye Ne Kadar Harcadik? (Kategori Dagilimi - Artik Genis ve Ferah) */}
+            {/* Nereye Ne Kadar Harcadık? (Kategori Dağılımı) */}
             <CategoryBreakdown
               budget={budget}
               categories={settings.categories}
@@ -239,11 +271,11 @@ export default function Home() {
           </div>
         )}
 
-        {/* 2. MUHASEBE GORUNUMU: Fatura ve Harcama Islemleri, Girisler ve Dokumler */}
+        {/* 2. MUHASEBE GÖRÜNÜMÜ: Fatura ve Harcama İşlemleri, Girişler ve Dökümler */}
         {currentView === 'accounting' && (
           <div className="space-y-5">
             
-            {/* Hizli Filtre & Islemler Paneli */}
+            {/* Hızlı Filtre & İşlemler Paneli */}
             <div className="bg-white rounded-xl border border-zinc-200 p-3.5 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1 mr-1">
@@ -294,7 +326,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Iki Kolonlu Muhasebe Tablosu */}
+            {/* İki Kolonlu Muhasebe Tablosu */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
               
               {/* Sol Kolon: Sabit Giderler & Faturalar + Gelirler (5 birim) */}
@@ -308,6 +340,7 @@ export default function Home() {
                   onUpdateAmount={handleUpdateFixedAmount}
                   onDeleteExpense={handleDeleteFixedExpense}
                   onAddFixedExpense={handleAddFixedExpense}
+                  onEditFixedExpense={(item) => setEditingFixedExpense(item)}
                 />
 
                 <IncomesCard
@@ -315,11 +348,12 @@ export default function Home() {
                   persons={settings.persons}
                   selectedPersonId={selectedPersonId}
                   onDeleteIncome={handleDeleteIncome}
+                  onEditIncome={(income) => setEditingIncome(income)}
                   onOpenAddIncome={() => setIsAddIncomeOpen(true)}
                 />
               </div>
 
-              {/* Sag Kolon: Gunluk & Degisken Harcamalar (7 birim) */}
+              {/* Sağ Kolon: Günlük & Değişken Harcamalar (7 birim) */}
               <div className="lg:col-span-7">
                 <VariableExpensesCard
                   expenses={budget.expenses}
@@ -327,6 +361,7 @@ export default function Home() {
                   categories={settings.categories}
                   selectedPersonId={selectedPersonId}
                   onDeleteExpense={handleDeleteExpense}
+                  onEditExpense={(expense) => setEditingExpense(expense)}
                   onOpenAddExpense={() => setIsAddExpenseOpen(true)}
                 />
               </div>
@@ -338,7 +373,7 @@ export default function Home() {
 
       </main>
 
-      {/* Mobil Icin Alt Gezinti Cubugu (Bottom Navigation Bar) */}
+      {/* Mobil İçin Alt Gezinti Çubuğu (Bottom Navigation Bar) */}
       <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-200 px-4 py-2 flex items-center justify-around shadow-lg">
         <button
           onClick={() => setCurrentView('dashboard')}
@@ -369,7 +404,7 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Modallar */}
+      {/* Ekleme Modalları */}
       <AddExpenseModal
         isOpen={isAddExpenseOpen}
         onClose={() => setIsAddExpenseOpen(false)}
@@ -387,6 +422,34 @@ export default function Home() {
         defaultPersonId={settings.persons[1]?.id || settings.persons[0]?.id || 'baba'}
       />
 
+      {/* Düzenleme Modalları */}
+      <EditExpenseModal
+        isOpen={!!editingExpense}
+        onClose={() => setEditingExpense(null)}
+        expense={editingExpense}
+        persons={settings.persons}
+        categories={settings.categories}
+        onSaveExpense={handleSaveExpense}
+      />
+
+      <EditIncomeModal
+        isOpen={!!editingIncome}
+        onClose={() => setEditingIncome(null)}
+        income={editingIncome}
+        persons={settings.persons}
+        onSaveIncome={handleSaveIncome}
+      />
+
+      <EditFixedExpenseModal
+        isOpen={!!editingFixedExpense}
+        onClose={() => setEditingFixedExpense(null)}
+        fixedExpense={editingFixedExpense}
+        persons={settings.persons}
+        categories={settings.categories}
+        onSaveFixedExpense={handleSaveFixedExpense}
+      />
+
+      {/* Ayarlar Modalı */}
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
@@ -395,6 +458,7 @@ export default function Home() {
         onConnectFirebase={handleConnectFirebase}
         isCloudConnected={isCloudConnected}
         onLoadMockup={handleLoadMockup}
+        onDataRestored={() => fetchMonthData(currentMonth)}
       />
 
     </div>

@@ -2,13 +2,14 @@
 
 import React from 'react';
 import { IncomeItem, Person, PersonId } from '@/types/budget';
-import { TrendingUp, Plus, Trash2, Calendar } from 'lucide-react';
+import { TrendingUp, Plus, Trash2, Calendar, Edit2 } from 'lucide-react';
 
 interface IncomesCardProps {
   incomes: IncomeItem[];
   persons: Person[];
   selectedPersonId: PersonId | 'all';
   onDeleteIncome: (id: string) => void;
+  onEditIncome: (income: IncomeItem) => void;
   onOpenAddIncome: () => void;
 }
 
@@ -17,6 +18,7 @@ export const IncomesCard: React.FC<IncomesCardProps> = ({
   persons,
   selectedPersonId,
   onDeleteIncome,
+  onEditIncome,
   onOpenAddIncome,
 }) => {
   const filteredList = incomes.filter(i => {
@@ -30,7 +32,7 @@ export const IncomesCard: React.FC<IncomesCardProps> = ({
   return (
     <div className="bg-white rounded-xl border border-zinc-200 shadow-xs overflow-hidden flex flex-col">
       
-      {/* Kart Basligi */}
+      {/* Kart Başlığı */}
       <div className="p-4 border-b border-zinc-200 bg-emerald-50/40 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
@@ -71,7 +73,7 @@ export const IncomesCard: React.FC<IncomesCardProps> = ({
             return (
               <div
                 key={item.id}
-                className="p-3 rounded-lg flex items-center justify-between gap-3 hover:bg-zinc-50 transition"
+                className="p-3 rounded-lg flex items-center justify-between gap-3 hover:bg-zinc-50 transition group"
               >
                 {/* Sol: Bilgi */}
                 <div className="min-w-0">
@@ -104,18 +106,29 @@ export const IncomesCard: React.FC<IncomesCardProps> = ({
                   </div>
                 </div>
 
-                {/* Sag: Tutar ve Silme */}
+                {/* Sağ: Tutar ve Butonlar */}
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-xs sm:text-sm font-bold text-emerald-600">
                     +{item.amount.toLocaleString('tr-TR')} ₺
                   </span>
-                  <button
-                    onClick={() => onDeleteIncome(item.id)}
-                    className="text-zinc-300 hover:text-rose-600 transition p-1 cursor-pointer"
-                    title="Bu geliri sil"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => onEditIncome(item)}
+                      className="text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 p-1 rounded-md transition cursor-pointer"
+                      title="Geliri düzenle"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      onClick={() => onDeleteIncome(item.id)}
+                      className="text-zinc-300 hover:text-rose-600 hover:bg-rose-50 p-1 rounded-md transition cursor-pointer"
+                      title="Bu geliri sil"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );

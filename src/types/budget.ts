@@ -73,14 +73,17 @@ export interface MonthlyBudget {
   notes?: string;
 }
 
+export interface FixedExpenseTemplate {
+  id?: string;
+  title: string;
+  expectedAmount: number;
+  categoryId: string;
+  personId: PersonId;
+  dueDate?: number;
+}
+
 export interface AppSettings {
   persons: Person[];
   categories: Category[];
-  defaultFixedExpenses: {
-    title: string;
-    expectedAmount: number;
-    categoryId: string;
-    personId: PersonId;
-    dueDate?: number;
-  }[];
+  defaultFixedExpenses: FixedExpenseTemplate[];
 }
