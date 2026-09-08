@@ -31,7 +31,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
   const [newAmount, setNewAmount] = useState('');
   const [newPerson, setNewPerson] = useState<PersonId>('ortak');
   const [newCategory, setNewCategory] = useState('fatura');
-  const [newDueDate, setNewDueDate] = useState('15');
+  const [newDueDate, setNewDueDate] = useState('');
 
   // Inline tutar düzenleme
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -62,11 +62,12 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
       actualAmount: parsed,
       categoryId: newCategory,
       personId: newPerson,
-      dueDate: parseInt(newDueDate, 10) || undefined,
+      dueDate: newDueDate ? (parseInt(newDueDate, 10) || undefined) : undefined,
     });
 
     setNewTitle('');
     setNewAmount('');
+    setNewDueDate('');
     setIsAdding(false);
   };
 
@@ -120,58 +121,85 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
 
       {/* Yeni Fatura Ekleme Formu (Açılırsa) */}
       {isAdding && (
-        <form onSubmit={handleSaveNew} className="p-3 bg-zinc-50 border-b border-zinc-200 space-y-2.5 text-xs">
-          <div className="font-semibold text-zinc-800">Yeni Sabit Gider / Fatura Ekle</div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <input
-              type="text"
-              placeholder="Fatura Adı (Örn: Su Faturası)"
-              value={newTitle}
-              onChange={e => setNewTitle(e.target.value)}
-              required
-              className="px-2.5 py-1.5 border border-zinc-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs"
-            />
-            <input
-              type="text"
-              inputMode="decimal"
-              placeholder="Beklenen Tutar (TL)"
-              value={newAmount}
-              onChange={e => setNewAmount(formatAmountInput(e.target.value))}
-              required
-              className="px-2.5 py-1.5 border border-zinc-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs"
-            />
+        <form onSubmit={handleSaveNew} className="p-4 bg-zinc-50 border-b border-zinc-200 space-y-3 text-xs">
+          <div className="font-bold text-zinc-900 text-sm">Yeni Sabit Gider / Fatura Ekle</div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                Fatura / Gider Adı *
+              </label>
+              <input
+                type="text"
+                placeholder="Örn: Elektrik, Su, Ev Kirası"
+                value={newTitle}
+                onChange={e => setNewTitle(e.target.value)}
+                required
+                className="w-full px-3 py-2 border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                Aylık Beklenen Tutar (₺) *
+              </label>
+              <input
+                type="text"
+                inputMode="decimal"
+                placeholder="0"
+                value={newAmount}
+                onChange={e => setNewAmount(formatAmountInput(e.target.value))}
+                required
+                className="w-full px-3 py-2 border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs"
+              />
+            </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            <select
-              value={newPerson}
-              onChange={e => setNewPerson(e.target.value)}
-              className="px-2 py-1.5 border border-zinc-300 rounded-md bg-white text-xs"
-            >
-              {persons.map(p => (
-                <option key={p.id} value={p.id}>{p.avatar} {p.name}</option>
-              ))}
-            </select>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                Sorumlu Kişi
+              </label>
+              <select
+                value={newPerson}
+                onChange={e => setNewPerson(e.target.value)}
+                className="w-full px-2.5 py-2 border border-zinc-300 rounded-lg bg-white text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              >
+                {persons.map(p => (
+                  <option key={p.id} value={p.id}>{p.avatar} {p.name}</option>
+                ))}
+              </select>
+            </div>
 
-            <select
-              value={newCategory}
-              onChange={e => setNewCategory(e.target.value)}
-              className="px-2 py-1.5 border border-zinc-300 rounded-md bg-white text-xs"
-            >
-              {categories.map(c => (
-                <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
-              ))}
-            </select>
+            <div>
+              <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                Kategori
+              </label>
+              <select
+                value={newCategory}
+                onChange={e => setNewCategory(e.target.value)}
+                className="w-full px-2.5 py-2 border border-zinc-300 rounded-lg bg-white text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              >
+                {categories.map(c => (
+                  <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                ))}
+              </select>
+            </div>
 
-            <input
-              type="number"
-              min="1"
-              max="31"
-              placeholder="Vade Günü (Örn: 15)"
-              value={newDueDate}
-              onChange={e => setNewDueDate(e.target.value)}
-              className="px-2 py-1.5 border border-zinc-300 rounded-md bg-white text-xs"
-            />
+            <div>
+              <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                Son Ödeme Günü (Ayın Kaçı)
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="31"
+                placeholder="Örn: 15 (İsteğe bağlı)"
+                value={newDueDate}
+                onChange={e => setNewDueDate(e.target.value)}
+                className="w-full px-3 py-2 border border-zinc-300 rounded-lg bg-white text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-1">

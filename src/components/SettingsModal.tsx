@@ -30,7 +30,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [newAmount, setNewAmount] = useState('');
   const [newPerson, setNewPerson] = useState<PersonId>('ortak');
   const [newCategory, setNewCategory] = useState('fatura');
-  const [newDueDate, setNewDueDate] = useState('15');
+  const [newDueDate, setNewDueDate] = useState('');
 
   // Kişiler
   const [persons, setPersons] = useState<Person[]>(settings.persons || []);
@@ -107,7 +107,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         expectedAmount: parseFormattedAmount(newAmount) || 0,
         categoryId: newCategory,
         personId: newPerson,
-        dueDate: parseInt(newDueDate, 10) || 15,
+        dueDate: newDueDate ? (parseInt(newDueDate, 10) || 15) : undefined,
       }
     ];
     setTemplates(updated);
@@ -115,6 +115,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
     setNewTitle('');
     setNewAmount('');
+    setNewDueDate('');
   };
 
   const handleDeleteTemplate = (index: number) => {
@@ -192,63 +193,90 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </p>
 
               {/* Yeni Şablon Ekleme */}
-              <form onSubmit={handleAddTemplate} className="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2 text-xs">
-                <div className="font-semibold text-zinc-800">Listeye Yeni Sabit Gider Ekle</div>
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    type="text"
-                    placeholder="Gider Adı (Kira, Elektrik...)"
-                    value={newTitle}
-                    onChange={e => setNewTitle(e.target.value)}
-                    required
-                    className="px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white"
-                  />
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    placeholder="Standart Tutar (TL)"
-                    value={newAmount}
-                    onChange={e => setNewAmount(formatAmountInput(e.target.value))}
-                    className="px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white"
-                  />
+              <form onSubmit={handleAddTemplate} className="p-4 bg-zinc-50 border border-zinc-200 rounded-xl space-y-3 text-xs">
+                <div className="font-bold text-zinc-900 text-sm">Listeye Yeni Sabit Gider Ekle</div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                      Sabit Gider / Fatura Adı *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Örn: Kira, Elektrik, İnternet"
+                      value={newTitle}
+                      onChange={e => setNewTitle(e.target.value)}
+                      required
+                      className="w-full px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                      Standart Tutar (₺)
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="0 (Değişkense boş bırakın)"
+                      value={newAmount}
+                      onChange={e => setNewAmount(formatAmountInput(e.target.value))}
+                      className="w-full px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    />
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
-                  <select
-                    value={newPerson}
-                    onChange={e => setNewPerson(e.target.value)}
-                    className="px-2 py-1.5 border border-zinc-300 rounded-lg bg-white"
-                  >
-                    {settings.persons.map(p => (
-                      <option key={p.id} value={p.id}>{p.avatar} {p.name}</option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                      Sorumlu Kişi
+                    </label>
+                    <select
+                      value={newPerson}
+                      onChange={e => setNewPerson(e.target.value)}
+                      className="w-full px-2 py-1.5 border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    >
+                      {settings.persons.map(p => (
+                        <option key={p.id} value={p.id}>{p.avatar} {p.name}</option>
+                      ))}
+                    </select>
+                  </div>
 
-                  <select
-                    value={newCategory}
-                    onChange={e => setNewCategory(e.target.value)}
-                    className="px-2 py-1.5 border border-zinc-300 rounded-lg bg-white"
-                  >
-                    {settings.categories.map(c => (
-                      <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
-                    ))}
-                  </select>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                      Kategori
+                    </label>
+                    <select
+                      value={newCategory}
+                      onChange={e => setNewCategory(e.target.value)}
+                      className="w-full px-2 py-1.5 border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    >
+                      {settings.categories.map(c => (
+                        <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                      ))}
+                    </select>
+                  </div>
 
-                  <input
-                    type="number"
-                    min="1"
-                    max="31"
-                    placeholder="Vade Günü"
-                    value={newDueDate}
-                    onChange={e => setNewDueDate(e.target.value)}
-                    className="px-2 py-1.5 border border-zinc-300 rounded-lg bg-white"
-                  />
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                      Son Ödeme Günü (Ayın Kaçı)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="31"
+                      placeholder="Örn: 15 (İsteğe bağlı)"
+                      value={newDueDate}
+                      onChange={e => setNewDueDate(e.target.value)}
+                      className="w-full px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex justify-end pt-1">
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" /> Şablona Ekle
                   </button>
@@ -291,33 +319,44 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </p>
 
               {/* Yeni Kişi Ekleme Formu */}
-              <form onSubmit={handleAddPerson} className="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2.5">
-                <div className="font-semibold text-zinc-800 flex items-center gap-1.5">
+              <form onSubmit={handleAddPerson} className="p-4 bg-zinc-50 border border-zinc-200 rounded-xl space-y-3">
+                <div className="font-bold text-zinc-900 text-sm flex items-center gap-1.5">
                   <UserPlus className="w-4 h-4 text-emerald-600" />
                   Yeni Birey / Kişi Ekle
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <input
-                    type="text"
-                    placeholder="İsim (ör. Ahmet, Ayşe, Mehmet...)"
-                    value={newPersonName}
-                    onChange={e => setNewPersonName(e.target.value)}
-                    required
-                    className="px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Rol / Tanım (ör. Anne, Çocuk, Ortak...)"
-                    value={newPersonRole}
-                    onChange={e => setNewPersonRole(e.target.value)}
-                    className="px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                      Kişi Adı *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Örn: Ayşe, Mehmet"
+                      value={newPersonName}
+                      onChange={e => setNewPersonName(e.target.value)}
+                      required
+                      className="w-full px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
+                      Rol / Tanım (Opsiyonel)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Örn: Anne, Çocuk, Ortak"
+                      value={newPersonRole}
+                      onChange={e => setNewPersonRole(e.target.value)}
+                      className="w-full px-2.5 py-1.5 border border-zinc-300 rounded-lg bg-white text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-xs font-medium text-zinc-600 mr-1">İkon:</span>
+                    <span className="text-xs font-semibold text-zinc-700 mr-1">İkon:</span>
                     {AVATAR_OPTIONS.map(emoji => (
                       <button
                         key={emoji}
@@ -337,7 +376,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition cursor-pointer shrink-0 ml-auto"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition cursor-pointer shrink-0 ml-auto text-xs"
                   >
                     <Plus className="w-4 h-4" /> Ekle
                   </button>
@@ -364,21 +403,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       >
                         {p.avatar}
                       </button>
-                      <div className="flex-1 min-w-0 space-y-1">
-                        <input
-                          type="text"
-                          value={p.name}
-                          onChange={e => handleUpdatePerson(p.id, 'name', e.target.value)}
-                          className="font-bold text-zinc-900 text-xs w-full bg-transparent hover:bg-zinc-50 focus:bg-white px-1.5 py-0.5 rounded border border-transparent focus:border-zinc-300 outline-none"
-                          placeholder="İsim"
-                        />
-                        <input
-                          type="text"
-                          value={p.role || ''}
-                          onChange={e => handleUpdatePerson(p.id, 'role', e.target.value)}
-                          className="text-[11px] text-zinc-500 w-full bg-transparent hover:bg-zinc-50 focus:bg-white px-1.5 py-0.5 rounded border border-transparent focus:border-zinc-300 outline-none"
-                          placeholder="Rol"
-                        />
+                      <div className="flex-1 min-w-0 space-y-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-semibold text-zinc-400 w-8 shrink-0">İsim:</span>
+                          <input
+                            type="text"
+                            value={p.name}
+                            onChange={e => handleUpdatePerson(p.id, 'name', e.target.value)}
+                            className="font-bold text-zinc-900 text-xs flex-1 bg-zinc-50 focus:bg-white px-2 py-1 rounded-md border border-zinc-200 focus:border-emerald-500 outline-none transition"
+                            placeholder="Kişi adı girin"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-semibold text-zinc-400 w-8 shrink-0">Rol:</span>
+                          <input
+                            type="text"
+                            value={p.role || ''}
+                            onChange={e => handleUpdatePerson(p.id, 'role', e.target.value)}
+                            className="text-[11px] text-zinc-600 flex-1 bg-zinc-50 focus:bg-white px-2 py-1 rounded-md border border-zinc-200 focus:border-emerald-500 outline-none transition"
+                            placeholder="Rol / tanım girin"
+                          />
+                        </div>
                       </div>
                     </div>
 

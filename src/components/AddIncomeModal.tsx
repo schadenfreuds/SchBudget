@@ -23,7 +23,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
   const todayStr = new Date().toISOString().split('T')[0];
 
   const [amount, setAmount] = useState('');
-  const [title, setTitle] = useState('Maaş');
+  const [title, setTitle] = useState('');
   const [selectedPerson, setSelectedPerson] = useState<PersonId>(defaultPersonId || persons[1]?.id || persons[0]?.id || 'baba');
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
     });
 
     setAmount('');
-    setTitle('Maaş');
+    setTitle('');
     setNote('');
     onClose();
   };
@@ -102,7 +102,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
           {/* Gelir Tanımı */}
           <div>
             <label className="block text-xs font-semibold text-zinc-600 mb-1">
-              Gelir Tanımı
+              Gelir Tanımı / Kaynağı *
             </label>
             <div className="flex gap-2 mb-2">
               {['Maaş', 'Emekli Maaşı', 'Ek Gelir', 'Prim'].map(t => (
@@ -111,7 +111,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
                   key={t}
                   onClick={() => setTitle(t)}
                   className={`px-2.5 py-1 text-xs rounded-lg border transition cursor-pointer ${
-                    title === t ? 'bg-emerald-100 border-emerald-400 font-bold text-emerald-800' : 'border-zinc-200 text-zinc-600'
+                    title === t ? 'bg-emerald-100 border-emerald-400 font-bold text-emerald-800' : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'
                   }`}
                 >
                   {t}
@@ -120,7 +120,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
             </div>
             <input
               type="text"
-              placeholder="Veya özel bir açıklama yaz..."
+              placeholder="Örn: Aylık Maaş, Kira Getirisi, Freelance..."
               value={title}
               onChange={e => setTitle(e.target.value)}
               className="w-full px-3 py-2 text-xs border border-zinc-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
