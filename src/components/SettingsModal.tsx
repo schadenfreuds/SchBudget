@@ -5,11 +5,14 @@ import { AppSettings, Person, Category } from '@/types/budget';
 import {
   X, Plus, Trash2, Cloud, Check, Wrench,
   Download, Upload, AlertTriangle,
-  Tag, Users, Palette, Sun, Moon, Monitor
+  Tag, Users, Palette, Sun, Moon, Monitor,
+  Globe, Coins
 } from 'lucide-react';
 import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
 import { downloadBackupFile, restoreBackupFile, clearAllLocalData } from '@/lib/backup';
 import { getStoredTheme, setTheme, ThemeMode } from '@/lib/theme';
+import { useI18n } from '@/context/I18nContext';
+import { CURRENCIES, CurrencyCode, Language } from '@/lib/i18n';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -36,6 +39,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'persons' | 'categories' | 'theme' | 'backup' | 'cloud' | 'devtools'>('persons');
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>('system');
+  const { t, lang, setLang, currency, setCurrency } = useI18n();
 
   useEffect(() => {
     if (isOpen) {
@@ -183,7 +187,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         
         {/* Üst Bar */}
         <div className="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-zinc-800/50">
-          <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100">Uygulama & Bütçe Ayarları</h3>
+          <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100">{t('settings.title')}</h3>
           <button
             onClick={onClose}
             className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition cursor-pointer"
@@ -203,7 +207,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }`}
           >
             <Users className="w-3.5 h-3.5" />
-            <span>Kişiler</span>
+            <span>{t('settings.tabs.persons')}</span>
           </button>
 
           <button
@@ -215,7 +219,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }`}
           >
             <Tag className="w-3.5 h-3.5" />
-            <span>Kategoriler</span>
+            <span>{t('settings.tabs.categories')}</span>
           </button>
 
           <button
@@ -227,7 +231,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }`}
           >
             <Palette className="w-3.5 h-3.5" />
-            <span>Görünüm</span>
+            <span>{t('settings.tabs.theme')}</span>
           </button>
 
           <button
@@ -239,7 +243,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }`}
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Yedekleme</span>
+            <span>{t('settings.tabs.backup')}</span>
           </button>
 
           <button
@@ -251,7 +255,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }`}
           >
             <Cloud className="w-3.5 h-3.5" />
-            <span>Bulut</span>
+            <span>{t('settings.tabs.cloud')}</span>
           </button>
 
           <button
@@ -263,7 +267,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }`}
           >
             <Wrench className="w-3.5 h-3.5" />
-            <span>DevTools</span>
+            <span>{t('settings.tabs.devtools')}</span>
           </button>
         </div>
 
@@ -452,77 +456,168 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {/* 3. GÖRÜNÜM / TEMA SEKME */}
           {activeTab === 'theme' && (
-            <div className="space-y-4">
-              <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 p-3 rounded-xl text-emerald-800 dark:text-emerald-300">
-                <p className="font-semibold">Tema & Görünüm Seçenekleri</p>
-                <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
-                  Uygulamanın açık, koyu veya cihazınızın sistem tercihine göre otomatik görünmesini ayarlayın.
-                </p>
+            <div className="space-y-6">
+              {/* Tema Seçimi */}
+              <div className="space-y-3">
+                <div>
+                  <div className="font-bold text-zinc-900 dark:text-zinc-100 text-xs flex items-center gap-1.5">
+                    <Palette className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span>{t('settings.appearance.themeTitle')}</span>
+                  </div>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                    {t('settings.appearance.themeDesc')}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTheme('light');
+                      setCurrentTheme('light');
+                    }}
+                    className={`p-3.5 rounded-xl border flex flex-col items-center gap-2 transition cursor-pointer ${
+                      currentTheme === 'light'
+                        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 ring-2 ring-emerald-400 text-zinc-900 dark:text-zinc-100 font-bold'
+                        : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                      <Sun className="w-4 h-4" />
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs font-bold">{t('settings.appearance.light')}</div>
+                      <div className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">{t('settings.appearance.lightDesc')}</div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTheme('dark');
+                      setCurrentTheme('dark');
+                    }}
+                    className={`p-3.5 rounded-xl border flex flex-col items-center gap-2 transition cursor-pointer ${
+                      currentTheme === 'dark'
+                        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 ring-2 ring-emerald-400 text-zinc-900 dark:text-zinc-100 font-bold'
+                        : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                      <Moon className="w-4 h-4" />
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs font-bold">{t('settings.appearance.dark')}</div>
+                      <div className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">{t('settings.appearance.darkDesc')}</div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTheme('system');
+                      setCurrentTheme('system');
+                    }}
+                    className={`p-3.5 rounded-xl border flex flex-col items-center gap-2 transition cursor-pointer ${
+                      currentTheme === 'system'
+                        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 ring-2 ring-emerald-400 text-zinc-900 dark:text-zinc-100 font-bold'
+                        : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center">
+                      <Monitor className="w-4 h-4" />
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs font-bold">{t('settings.appearance.system')}</div>
+                      <div className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">{t('settings.appearance.systemDesc')}</div>
+                    </div>
+                  </button>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTheme('light');
-                    setCurrentTheme('light');
-                  }}
-                  className={`p-4 rounded-xl border flex flex-col items-center gap-2.5 transition cursor-pointer ${
-                    currentTheme === 'light'
-                      ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 ring-2 ring-emerald-400 text-zinc-900 dark:text-zinc-100 font-bold'
-                      : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                    <Sun className="w-5 h-5" />
+              {/* Dil Seçimi (Language) */}
+              <div className="space-y-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                <div>
+                  <div className="font-bold text-zinc-900 dark:text-zinc-100 text-xs flex items-center gap-1.5">
+                    <Globe className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <span>{t('settings.appearance.languageTitle')}</span>
                   </div>
-                  <div className="text-center">
-                    <div className="text-xs font-bold">Açık Tema</div>
-                    <div className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">Klasik aydınlık görünüm</div>
-                  </div>
-                </button>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                    {t('settings.appearance.languageDesc')}
+                  </p>
+                </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTheme('dark');
-                    setCurrentTheme('dark');
-                  }}
-                  className={`p-4 rounded-xl border flex flex-col items-center gap-2.5 transition cursor-pointer ${
-                    currentTheme === 'dark'
-                      ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 ring-2 ring-emerald-400 text-zinc-900 dark:text-zinc-100 font-bold'
-                      : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                    <Moon className="w-5 h-5" />
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs font-bold">Koyu Tema</div>
-                    <div className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">Gözü yormayan karanlık mod</div>
-                  </div>
-                </button>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setLang('tr')}
+                    className={`p-3 rounded-xl border flex items-center gap-3 transition cursor-pointer ${
+                      lang === 'tr'
+                        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 ring-2 ring-emerald-400 text-zinc-900 dark:text-zinc-100 font-bold'
+                        : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                    }`}
+                  >
+                    <div className="text-2xl">🇹🇷</div>
+                    <div className="text-left">
+                      <div className="text-xs font-bold">{t('settings.appearance.langTr')}</div>
+                      <div className="text-[10px] text-zinc-400 dark:text-zinc-500">{t('settings.appearance.langTrDesc')}</div>
+                    </div>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTheme('system');
-                    setCurrentTheme('system');
-                  }}
-                  className={`p-4 rounded-xl border flex flex-col items-center gap-2.5 transition cursor-pointer ${
-                    currentTheme === 'system'
-                      ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 ring-2 ring-emerald-400 text-zinc-900 dark:text-zinc-100 font-bold'
-                      : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center">
-                    <Monitor className="w-5 h-5" />
+                  <button
+                    type="button"
+                    onClick={() => setLang('en')}
+                    className={`p-3 rounded-xl border flex items-center gap-3 transition cursor-pointer ${
+                      lang === 'en'
+                        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 ring-2 ring-emerald-400 text-zinc-900 dark:text-zinc-100 font-bold'
+                        : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                    }`}
+                  >
+                    <div className="text-2xl">🇬🇧</div>
+                    <div className="text-left">
+                      <div className="text-xs font-bold">{t('settings.appearance.langEn')}</div>
+                      <div className="text-[10px] text-zinc-400 dark:text-zinc-500">{t('settings.appearance.langEnDesc')}</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Para Birimi (Currency) */}
+              <div className="space-y-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                <div>
+                  <div className="font-bold text-zinc-900 dark:text-zinc-100 text-xs flex items-center gap-1.5">
+                    <Coins className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    <span>{t('settings.appearance.currencyTitle')}</span>
                   </div>
-                  <div className="text-center">
-                    <div className="text-xs font-bold">Sistem Varsayılanı</div>
-                    <div className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">Cihaz temasını izler</div>
-                  </div>
-                </button>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                    {t('settings.appearance.currencyDesc')}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {(Object.keys(CURRENCIES) as CurrencyCode[]).map((cCode) => {
+                    const c = CURRENCIES[cCode];
+                    const isSelected = currency === cCode;
+                    return (
+                      <button
+                        key={cCode}
+                        type="button"
+                        onClick={() => setCurrency(cCode)}
+                        className={`p-2.5 rounded-xl border flex flex-col items-center gap-1 transition cursor-pointer ${
+                          isSelected
+                            ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 ring-2 ring-emerald-400 text-zinc-900 dark:text-zinc-100 font-bold'
+                            : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                        }`}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center font-bold text-sm">
+                          {c.symbol}
+                        </div>
+                        <div className="text-[11px] font-bold mt-0.5">{cCode}</div>
+                        <div className="text-[9px] text-zinc-400 dark:text-zinc-500">{c.name}</div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}

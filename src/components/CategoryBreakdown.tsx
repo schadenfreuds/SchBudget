@@ -1,8 +1,7 @@
-'use client';
-
 import React from 'react';
 import { MonthlyBudget, Category, PersonId } from '@/types/budget';
 import { PieChart, ArrowRight } from 'lucide-react';
+import { useI18n } from '@/context/I18nContext';
 
 interface CategoryBreakdownProps {
   budget: MonthlyBudget;
@@ -17,6 +16,8 @@ export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
   selectedPersonId,
   onGoToAccounting,
 }) => {
+  const { t, formatMoney, translateCategory } = useI18n();
+
   // Sabit ve degisken harcamalari birlestir
   const allExpenses = [
     ...budget.expenses
@@ -40,7 +41,7 @@ export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
       const cat = categories.find(c => c.id === catId);
       return {
         id: catId,
-        name: cat?.name || 'Diger',
+        name: cat ? translateCategory(cat) : 'Other',
         icon: cat?.icon || '📦',
         amount,
         percentage: totalSpent > 0 ? (amount / totalSpent) * 100 : 0,
@@ -58,14 +59,14 @@ export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
             <PieChart className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">Nereye Ne Kadar Harcadık?</h3>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Bu ayki sabit faturalar ve tüm harcamaların kategori dağılımı</p>
+            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">{t('category.title')}</h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">{t('summary.totalExpenseSub')}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <span className="text-xs sm:text-sm font-bold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-lg">
-            Toplam Harcama: {totalSpent.toLocaleString('tr-TR')} ₺
+            {t('category.totalSpent')}: {formatMoney(totalSpent)}
           </span>
           {onGoToAccounting && (
             <button
@@ -82,17 +83,7 @@ export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
       {totalSpent === 0 ? (
         <div className="py-12 text-center">
           <div className="text-3xl mb-2">📊</div>
-          <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Bu ay için henüz harcama kaydı bulunmuyor.</p>
-          <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">Fatura veya günlük harcama eklemek için Muhasebe sekmesine geçebilirsiniz.</p>
-          {onGoToAccounting && (
-            <button
-              onClick={onGoToAccounting}
-              className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
-            >
-              <span>Muhasebe Sayfasına Git</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          )}
+          <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">{t('category.noExpenses')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 pt-4">
@@ -108,7 +99,7 @@ export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
                     %{item.percentage.toFixed(1)}
                   </span>
                   <span className="font-bold text-zinc-900 dark:text-zinc-100">
-                    {item.amount.toLocaleString('tr-TR')} ₺
+                    {formatMoney(item.amount)}
                   </span>
                 </div>
               </div>

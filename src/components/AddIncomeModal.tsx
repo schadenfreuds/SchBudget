@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Person, IncomeItem, PersonId } from '@/types/budget';
 import { X, TrendingUp } from 'lucide-react';
 import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
+import { useI18n } from '@/context/I18nContext';
 
 interface AddIncomeModalProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
   onAddIncome,
   defaultPersonId,
 }) => {
+  const { t, currencySymbol, translatePerson } = useI18n();
   const todayStr = new Date().toISOString().split('T')[0];
 
   const [amount, setAmount] = useState('');
@@ -65,7 +67,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
             <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
-            <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100">Gelir Ekle</h3>
+            <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100">{t('modals.addIncomeTitle')}</h3>
           </div>
           <button
             onClick={onClose}
@@ -80,7 +82,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
           {/* Tutar Girişi */}
           <div>
             <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-              Gelir Tutarı (₺) *
+              {t('modals.amountLabel')} ({currencySymbol}) *
             </label>
             <div className="relative">
               <input
@@ -94,7 +96,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
                 className="w-full px-3.5 py-2.5 text-2xl font-bold text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-900 border-2 border-emerald-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400/20"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl font-bold text-zinc-400 dark:text-zinc-500">
-                ₺
+                {currencySymbol}
               </span>
             </div>
           </div>
@@ -102,22 +104,8 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
           {/* Gelir Tanımı */}
           <div>
             <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-              Gelir Tanımı / Kaynağı *
+              {t('modals.titleLabel')}
             </label>
-            <div className="flex gap-2 mb-2">
-              {['Maaş', 'Emekli Maaşı', 'Ek Gelir', 'Prim'].map(t => (
-                <button
-                  type="button"
-                  key={t}
-                  onClick={() => setTitle(t)}
-                  className={`px-2.5 py-1 text-xs rounded-lg border transition cursor-pointer ${
-                    title === t ? 'bg-emerald-100 dark:bg-emerald-950/50 border-emerald-400 dark:border-emerald-600 font-bold text-emerald-800 dark:text-emerald-300' : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
             <input
               type="text"
               placeholder="Örn: Aylık Maaş, Kira Getirisi, Freelance..."
@@ -130,7 +118,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
           {/* İlgili Kişi */}
           <div>
             <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">
-              Kimin Geliri? *
+              {t('modals.personLabel')}
             </label>
             <div className="grid grid-cols-2 gap-2">
               {persons.map(person => {
@@ -147,7 +135,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
                     }`}
                   >
                     <span className="text-base">{person.avatar}</span>
-                    <span>{person.name}</span>
+                    <span>{translatePerson(person)}</span>
                   </button>
                 );
               })}
@@ -157,7 +145,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
           {/* Tarih */}
           <div>
             <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-              Tarih
+              {t('modals.dateLabel')}
             </label>
             <input
               type="date"
@@ -173,7 +161,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({
               type="submit"
               className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-sm transition cursor-pointer"
             >
-              Geliri Kaydet
+              {t('modals.saveBtn')}
             </button>
           </div>
 

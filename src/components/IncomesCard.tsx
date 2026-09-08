@@ -1,8 +1,7 @@
-'use client';
-
 import React from 'react';
 import { IncomeItem, Person, PersonId } from '@/types/budget';
 import { TrendingUp, Plus, Trash2, Calendar, Edit2 } from 'lucide-react';
+import { useI18n } from '@/context/I18nContext';
 
 interface IncomesCardProps {
   incomes: IncomeItem[];
@@ -21,6 +20,8 @@ export const IncomesCard: React.FC<IncomesCardProps> = ({
   onEditIncome,
   onOpenAddIncome,
 }) => {
+  const { t, formatMoney, translatePerson } = useI18n();
+
   const filteredList = incomes.filter(i => {
     if (selectedPersonId === 'all') return true;
     return i.personId === selectedPersonId;
@@ -40,13 +41,13 @@ export const IncomesCard: React.FC<IncomesCardProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">Gelirler</h2>
+              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">{t('incomes.title')}</h2>
               <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 font-semibold text-emerald-800 dark:text-emerald-300">
-                {filteredList.length} adet
+                {filteredList.length}
               </span>
             </div>
             <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">
-              Toplam: {totalIncome.toLocaleString('tr-TR')} ₺
+              {t('incomes.totalIncome')}: {formatMoney(totalIncome)}
             </p>
           </div>
         </div>
@@ -56,7 +57,7 @@ export const IncomesCard: React.FC<IncomesCardProps> = ({
           className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-zinc-700 transition cursor-pointer shadow-xs"
         >
           <Plus className="w-3.5 h-3.5" />
-          <span>Gelir Ekle</span>
+          <span>+ {t('nav.addIncome')}</span>
         </button>
       </div>
 
@@ -109,7 +110,7 @@ export const IncomesCard: React.FC<IncomesCardProps> = ({
                 {/* Sağ: Tutar ve Butonlar */}
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                    +{item.amount.toLocaleString('tr-TR')} ₺
+                    +{formatMoney(item.amount)}
                   </span>
 
                   <div className="flex items-center gap-1">

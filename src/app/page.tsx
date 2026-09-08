@@ -16,6 +16,7 @@ import {
 import { clearAllLocalData } from '@/lib/backup';
 import { initFirebase, subscribeToMonth, saveMonthToFirebase } from '@/lib/firebase';
 import { exportBudgetToExcel } from '@/lib/excelExport';
+import { useI18n } from '@/context/I18nContext';
 
 import { Header, AppView } from '@/components/Header';
 import { SummaryCards } from '@/components/SummaryCards';
@@ -37,6 +38,7 @@ import { Plus, LayoutDashboard, ReceiptText, CalendarCheck, Target, Users } from
 import { DEFAULT_APP_SETTINGS } from '@/lib/constants';
 
 export default function Home() {
+  const { t, translatePerson } = useI18n();
   const [currentMonth, setCurrentMonth] = useState<string>(() => getMonthKey());
   const [settings, setSettingsState] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
   const [budget, setBudget] = useState<MonthlyBudget>(() => createInitialMonthBudget(getMonthKey()));
@@ -353,7 +355,7 @@ export default function Home() {
             <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-2.5 sm:p-3.5 shadow-xs flex items-center justify-between overflow-hidden">
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 w-full sm:w-auto">
                 <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
-                  <Users className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" /> Kişi:
+                  <Users className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
                 </span>
                 <button
                   onClick={() => setSelectedPersonId('all')}
@@ -363,7 +365,7 @@ export default function Home() {
                       : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                   }`}
                 >
-                  Tümü
+                  {t('nav.allPersons')}
                 </button>
                 {settings.persons.map(p => (
                   <button
@@ -376,7 +378,7 @@ export default function Home() {
                     }`}
                   >
                     <span>{p.avatar}</span>
-                    <span>{p.name}</span>
+                    <span>{translatePerson(p)}</span>
                   </button>
                 ))}
               </div>
@@ -581,7 +583,7 @@ export default function Home() {
           }`}
         >
           <LayoutDashboard className="w-4 h-4" />
-          <span>Anasayfa</span>
+          <span>{t('nav.dashboard')}</span>
         </button>
 
         <button
@@ -591,7 +593,7 @@ export default function Home() {
           }`}
         >
           <ReceiptText className="w-4 h-4" />
-          <span>Harcama</span>
+          <span>{t('nav.accounting')}</span>
         </button>
 
         <button
@@ -600,7 +602,7 @@ export default function Home() {
             setIsAddExpenseOpen(true);
           }}
           className="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-md flex items-center justify-center transition active:scale-95 cursor-pointer -mt-4 border-2 border-white dark:border-zinc-900 shrink-0 mx-1"
-          aria-label="Harcama Ekle"
+          aria-label={t('nav.addExpense')}
         >
           <Plus className="w-5 h-5 stroke-[2.5]" />
         </button>
@@ -612,7 +614,7 @@ export default function Home() {
           }`}
         >
           <CalendarCheck className="w-4 h-4" />
-          <span>Faturalar</span>
+          <span>{t('nav.bills')}</span>
         </button>
 
         <button
@@ -622,7 +624,7 @@ export default function Home() {
           }`}
         >
           <Target className="w-4 h-4" />
-          <span>Bütçe</span>
+          <span>{t('nav.budget')}</span>
         </button>
       </div>
 

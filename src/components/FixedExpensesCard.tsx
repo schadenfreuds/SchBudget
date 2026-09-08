@@ -1,9 +1,8 @@
-'use client';
-
 import React, { useState } from 'react';
 import { FixedExpenseItem, Person, Category, PersonId } from '@/types/budget';
 import { Check, Clock, Plus, Trash2, Edit3, Calendar, Edit2, Search } from 'lucide-react';
 import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
+import { useI18n } from '@/context/I18nContext';
 
 interface FixedExpensesCardProps {
   fixedExpenses: FixedExpenseItem[];
@@ -28,6 +27,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
   onAddFixedExpense,
   onEditFixedExpense,
 }) => {
+  const { t, formatMoney, currencySymbol } = useI18n();
   const [isAdding, setIsAdding] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newAmount, setNewAmount] = useState('');
@@ -155,13 +155,13 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">Sabit Giderler & Faturalar</h2>
+              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">{t('fixed.title')}</h2>
               <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-700 font-semibold text-zinc-700 dark:text-zinc-200">
                 {paidCount}/{totalCount}
               </span>
             </div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Ödenen: <strong className="text-zinc-800 dark:text-zinc-200">{paidAmount.toLocaleString('tr-TR')} ₺</strong> / Toplam: <strong className="text-zinc-800 dark:text-zinc-200">{totalAmount.toLocaleString('tr-TR')} ₺</strong>
+              {t('fixed.paidLabel')}: <strong className="text-zinc-800 dark:text-zinc-200">{formatMoney(paidAmount)}</strong> / {t('fixed.totalLabel')}: <strong className="text-zinc-800 dark:text-zinc-200">{formatMoney(totalAmount)}</strong>
             </p>
           </div>
 
@@ -169,7 +169,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
             onClick={() => setIsAdding(!isAdding)}
             className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition cursor-pointer shadow-xs"
           >
-            <span>+ Fatura Ekle</span>
+            <span>+ {t('fixed.newBill')}</span>
           </button>
         </div>
 
@@ -422,11 +422,11 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                   ) : (
                     <button
                       onClick={() => startEditAmount(item)}
-                      title="Tutarı hızlıca değiştirmek için tıkla"
+                      title="Tutarı düzenle"
                       className="group/btn flex items-center gap-1 text-right cursor-pointer"
                     >
                       <span className={`text-xs sm:text-sm font-bold ${item.isPaid ? 'text-zinc-600 dark:text-zinc-400' : 'text-zinc-900 dark:text-zinc-100'}`}>
-                        {amount.toLocaleString('tr-TR')} ₺
+                        {formatMoney(amount)}
                       </span>
                       <Edit3 className="w-3 h-3 text-zinc-300 dark:text-zinc-600 group-hover/btn:text-zinc-600 dark:group-hover/btn:text-zinc-300 transition" />
                     </button>

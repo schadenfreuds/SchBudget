@@ -45,6 +45,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { I18nProvider } from "@/context/I18nContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -68,6 +70,10 @@ export default function RootLayout({
                 } else {
                   document.documentElement.classList.remove('dark');
                 }
+                const lang = localStorage.getItem('aile_butcesi_lang');
+                if (lang) {
+                  document.documentElement.lang = lang;
+                }
               } catch (e) {}
 
               if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
@@ -80,7 +86,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-200" suppressHydrationWarning>
-        {children}
+        <I18nProvider>
+          {children}
+        </I18nProvider>
       </body>
     </html>
   );

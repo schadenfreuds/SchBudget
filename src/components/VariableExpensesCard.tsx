@@ -1,8 +1,7 @@
-'use client';
-
 import React, { useState } from 'react';
 import { ExpenseItem, Person, Category, PersonId } from '@/types/budget';
 import { Search, Trash2, CreditCard, Banknote, ShoppingBag, Edit2 } from 'lucide-react';
+import { useI18n } from '@/context/I18nContext';
 
 interface VariableExpensesCardProps {
   expenses: ExpenseItem[];
@@ -23,6 +22,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
   onEditExpense,
   onOpenAddExpense,
 }) => {
+  const { t, formatMoney, translateCategory, translatePerson } = useI18n();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [paymentFilter, setPaymentFilter] = useState<'all' | 'kredi_karti' | 'nakit'>('all');
@@ -68,13 +68,13 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">Günlük & Değişken Harcamalar</h2>
+              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">{t('variable.title')}</h2>
               <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-700 font-semibold text-zinc-700 dark:text-zinc-200">
-                {filtered.length} kayıt
+                {filtered.length}
               </span>
             </div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Toplam Harcama: <strong className="text-zinc-800 dark:text-zinc-200">{totalFiltered.toLocaleString('tr-TR')} ₺</strong>
+              {t('variable.totalSpent')}: <strong className="text-zinc-800 dark:text-zinc-200">{formatMoney(totalFiltered)}</strong>
             </p>
           </div>
 
@@ -82,7 +82,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
             onClick={onOpenAddExpense}
             className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition cursor-pointer shadow-xs"
           >
-            <span>+ Harcama Ekle</span>
+            <span>+ {t('nav.addExpense')}</span>
           </button>
         </div>
 
@@ -205,7 +205,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
                 {/* Sağ: Tutar + Düzenle & Sil butonları */}
                 <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-1">
                   <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                    {Number(expense.amount).toLocaleString('tr-TR')} ₺
+                    {formatMoney(Number(expense.amount))}
                   </span>
 
                   <div className="flex items-center gap-0.5">

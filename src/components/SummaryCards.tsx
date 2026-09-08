@@ -3,6 +3,7 @@
 import React from 'react';
 import { MonthlyBudget, Person, PersonId } from '@/types/budget';
 import { ArrowDownRight, ArrowUpRight, Wallet, CheckCircle2, Clock, CreditCard, Banknote } from 'lucide-react';
+import { useI18n } from '@/context/I18nContext';
 
 interface SummaryCardsProps {
   budget: MonthlyBudget;
@@ -17,6 +18,8 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
   selectedPersonId,
   onSelectPerson,
 }) => {
+  const { t, formatMoney, translatePerson } = useI18n();
+
   // Hesaplamalar
   const totalIncome = budget.incomes.reduce((s, i) => s + (Number(i.amount) || 0), 0);
 
@@ -47,10 +50,6 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
   const cardPct = variableTotal > 0 ? Math.round((creditCardTotal / variableTotal) * 100) : 0;
   const cashPct = variableTotal > 0 ? 100 - cardPct : 0;
 
-  const formatCurrency = (val: number) => {
-    return val.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' ₺';
-  };
-
   return (
     <div className="space-y-4">
       {/* 3 Ana Finansal Özet Kartı */}
@@ -59,34 +58,38 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
         {/* Toplam Gelir */}
         <div className="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800 shadow-xs relative overflow-hidden transition-colors duration-200">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Toplam Gelir</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+              {t('summary.totalIncome')}
+            </span>
             <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
               <ArrowUpRight className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2 text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100" suppressHydrationWarning>
-            {formatCurrency(totalIncome)}
+            {formatMoney(totalIncome)}
           </div>
           <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400" suppressHydrationWarning>
-            {budget.incomes.length > 0 ? `${budget.incomes.length} gelir kaydı` : 'Henüz gelir girilmedi'}
+            {t('summary.totalIncomeSub')}
           </p>
         </div>
 
         {/* Toplam Gider */}
         <div className="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800 shadow-xs relative overflow-hidden transition-colors duration-200">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Toplam Gider</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+              {t('summary.totalExpense')}
+            </span>
             <div className="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center">
               <ArrowDownRight className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2 text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100" suppressHydrationWarning>
-            {formatCurrency(totalExpense)}
+            {formatMoney(totalExpense)}
           </div>
           <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400" suppressHydrationWarning>
-            <span>Sabit: {formatCurrency(fixedTotal)}</span>
+            <span>{t('category.fixedPortion')}: {formatMoney(fixedTotal)}</span>
             <span>•</span>
-            <span>Günlük: {formatCurrency(variableTotal)}</span>
+            <span>{t('category.variablePortion')}: {formatMoney(variableTotal)}</span>
           </div>
         </div>
 
@@ -97,22 +100,24 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
             : 'bg-gradient-to-br from-rose-500 to-red-600 text-white border-rose-600'
         }`}>
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-white/80">Kalan Net Bütçe</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-white/80">
+              {t('summary.netBalance')}
+            </span>
             <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
               <Wallet className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight" suppressHydrationWarning>
-            {formatCurrency(netBalance)}
+            {formatMoney(netBalance)}
           </div>
           <div className="mt-1 flex items-center gap-1.5 text-xs text-white/90">
             {fixedPending > 0 ? (
               <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5" /> {formatCurrency(fixedPending)} bekleyen fatura var
+                <Clock className="w-3.5 h-3.5" /> {formatMoney(fixedPending)} {t('summary.fixedPendingSub')}
               </span>
             ) : (
               <span className="flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Tüm sabit faturalar ödendi
+                <CheckCircle2 className="w-3.5 h-3.5" /> {t('summary.fixedPaidSub')}
               </span>
             )}
           </div>
@@ -129,17 +134,17 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
                 <CreditCard className="w-3.5 h-3.5" />
               </div>
               <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wide">
-                Harcama Ödeme Kanalları
+                {t('variable.allPayments')}
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-medium">
               <span className="text-indigo-700 dark:text-indigo-300 flex items-center gap-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block" />
-                Kart: <strong className="font-bold">{formatCurrency(creditCardTotal)}</strong> ({cardPct}%)
+                {t('variable.creditCard')}: <strong className="font-bold">{formatMoney(creditCardTotal)}</strong> ({cardPct}%)
               </span>
               <span className="text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
-                Nakit: <strong className="font-bold">{formatCurrency(cashTotal)}</strong> ({cashPct}%)
+                {t('variable.cash')}: <strong className="font-bold">{formatMoney(cashTotal)}</strong> ({cashPct}%)
               </span>
             </div>
           </div>
@@ -148,12 +153,12 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
             <div
               className="bg-indigo-500 h-2 transition-all duration-300"
               style={{ width: `${cardPct}%` }}
-              title={`Kredi Kartı: %${cardPct}`}
+              title={`Kart: %${cardPct}`}
             />
             <div
               className="bg-emerald-500 h-2 transition-all duration-300"
               style={{ width: `${cashPct}%` }}
-              title={`Nakit / Banka: %${cashPct}`}
+              title={`Nakit: %${cashPct}`}
             />
           </div>
         </div>
@@ -163,15 +168,14 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
       <div className="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800 shadow-xs transition-colors duration-200">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Kişi Bazlı Harcamalar</span>
-            <span className="text-xs text-zinc-400 dark:text-zinc-500 font-normal hidden sm:inline">(Filtrelemek için tıkla)</span>
+            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{t('settings.tabs.persons')}</span>
           </div>
           {selectedPersonId !== 'all' && (
             <button
               onClick={() => onSelectPerson('all')}
               className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold hover:underline cursor-pointer"
             >
-              Tümünü Göster
+              {t('nav.allPersons')}
             </button>
           )}
         </div>
@@ -202,13 +206,15 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
                 <div className="flex items-center justify-between w-full">
                   <span className="text-base">{person.avatar}</span>
                   <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 truncate max-w-[80px]">
-                    {person.role || person.name}
+                    {translatePerson(person)}
                   </span>
                 </div>
                 <div className="mt-2 min-w-0">
-                  <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 truncate">{person.name}</div>
+                  <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 truncate">
+                    {translatePerson(person)}
+                  </div>
                   <div className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 truncate">
-                    {formatCurrency(pTotal)}
+                    {formatMoney(pTotal)}
                   </div>
                 </div>
               </button>

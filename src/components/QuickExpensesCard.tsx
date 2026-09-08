@@ -1,10 +1,9 @@
-'use client';
-
 import React, { useState } from 'react';
 import { QuickExpenseTemplate, PersonId, ExpenseItem, AppSettings, Category } from '@/types/budget';
 import { Zap, Plus, Trash2, Check, CreditCard, Banknote, Edit3 } from 'lucide-react';
 import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
 import { DEFAULT_QUICK_TEMPLATES } from '@/lib/constants';
+import { useI18n } from '@/context/I18nContext';
 
 interface QuickExpensesCardProps {
   settings: AppSettings;
@@ -21,6 +20,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
   onOpenWithPreset,
   onSaveSettings,
 }) => {
+  const { t, formatMoney, currencySymbol, translateCategory } = useI18n();
   const [isAddingCustom, setIsAddingCustom] = useState(false);
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
@@ -89,14 +89,8 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">Hızlı Harcama Şablonları</h2>
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 font-semibold text-amber-900 dark:text-amber-300">
-                1 Dokunuşla Ekle
-              </span>
+              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">{t('quick.title')}</h2>
             </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Rutin harcamalara dokununca anında bugünün harcamalarına ekler
-            </p>
           </div>
         </div>
 
@@ -105,18 +99,18 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
           className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition cursor-pointer shadow-xs"
         >
           <Plus className="w-3.5 h-3.5" />
-          <span>Şablon Ekle</span>
+          <span>{t('quick.addCustom')}</span>
         </button>
       </div>
 
       {/* Yeni Özel Şablon Ekleme Formu */}
       {isAddingCustom && (
         <form onSubmit={handleSaveCustom} className="p-4 bg-zinc-50 dark:bg-zinc-800/80 border-b border-zinc-200 dark:border-zinc-800 space-y-3 text-xs">
-          <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Yeni Hızlı Harcama Kısayolu Ekle</div>
+          <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">{t('quick.newTitle')}</div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Başlık *</label>
+              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">{t('quick.titleLabel')}</label>
               <input
                 type="text"
                 required
@@ -128,7 +122,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Varsayılan Tutar (₺) *</label>
+              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">{t('quick.amountLabel')} ({currencySymbol}) *</label>
               <input
                 type="text"
                 inputMode="decimal"
@@ -143,14 +137,14 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Kategori</label>
+              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">{t('quick.categoryLabel')}</label>
               <select
                 value={categoryId}
                 onChange={e => setCategoryId(e.target.value)}
                 className="w-full px-2 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs"
               >
                 {settings.categories.map(c => (
-                  <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                  <option key={c.id} value={c.id}>{c.icon} {translateCategory(c)}</option>
                 ))}
               </select>
             </div>
@@ -169,14 +163,14 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Ödeme Türü</label>
+              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">{t('quick.methodLabel')}</label>
               <select
                 value={paymentMethod}
                 onChange={e => setPaymentMethod(e.target.value as 'kredi_karti' | 'nakit')}
                 className="w-full px-2 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs"
               >
-                <option value="kredi_karti">💳 Kredi Kartı</option>
-                <option value="nakit">💵 Nakit</option>
+                <option value="kredi_karti">💳 {t('variable.creditCard')}</option>
+                <option value="nakit">💵 {t('variable.cash')}</option>
               </select>
             </div>
           </div>
@@ -187,13 +181,13 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
               onClick={() => setIsAddingCustom(false)}
               className="px-3 py-1 rounded border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
             >
-              Vazgeç
+              {t('quick.cancelBtn')}
             </button>
             <button
               type="submit"
               className="px-3.5 py-1 rounded bg-amber-600 text-white font-bold hover:bg-amber-700 transition cursor-pointer"
             >
-              Kaydet
+              {t('quick.saveBtn')}
             </button>
           </div>
         </form>
@@ -258,7 +252,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
                 </div>
                 <div className="flex items-center gap-1.5 mt-1">
                   <span className="text-sm sm:text-base font-extrabold text-emerald-600 dark:text-emerald-400">
-                    {tpl.amount.toLocaleString('tr-TR')} ₺
+                    {formatMoney(tpl.amount)}
                   </span>
                   <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
                     {tpl.paymentMethod === 'nakit' ? '💵 Nakit' : '💳 Kart'}

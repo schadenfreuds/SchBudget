@@ -1,9 +1,8 @@
-'use client';
-
 import React, { useState } from 'react';
 import { AppSettings, FixedExpenseTemplate, Person, Category } from '@/types/budget';
 import { BookmarkCheck, Plus, Trash2, Calendar, Sparkles, Check } from 'lucide-react';
 import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
+import { useI18n } from '@/context/I18nContext';
 
 interface FixedExpenseTemplatesCardProps {
   settings: AppSettings;
@@ -16,6 +15,7 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
   onSaveSettings,
   onSyncMissingTemplatesToCurrentMonth,
 }) => {
+  const { t, formatMoney } = useI18n();
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState('');
   const [expectedAmount, setExpectedAmount] = useState('');
@@ -76,23 +76,22 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">Rutin Fatura Şablonları</h2>
+              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">{t('templates.title')}</h2>
               <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 font-semibold text-amber-900 dark:text-amber-300">
-                {templates.length} şablon
+                {templates.length}
               </span>
             </div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Her yeni ayda otomatik başlayacak sabit gider ve abonelikler
+              {t('templates.syncBarText')}
             </p>
           </div>
         </div>
 
         <button
           onClick={() => setIsAdding(!isAdding)}
-          className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition cursor-pointer shadow-xs"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition cursor-pointer shadow-xs"
         >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Şablon Ekle</span>
+          <span>+ {t('templates.addTemplate')}</span>
         </button>
       </div>
 
@@ -235,7 +234,7 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
 
                 <div className="flex items-center gap-2.5 shrink-0">
                   <span className="text-xs sm:text-sm font-bold text-zinc-700 dark:text-zinc-200">
-                    {tpl.expectedAmount > 0 ? `${tpl.expectedAmount.toLocaleString('tr-TR')} ₺` : 'Belirtilmedi'}
+                    {tpl.expectedAmount > 0 ? formatMoney(tpl.expectedAmount) : t('templates.unspecified')}
                   </span>
 
                   <button
@@ -260,7 +259,7 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
               <Sparkles className="w-3.5 h-3.5" />
             </div>
             <span className="text-[11px] font-medium text-zinc-600 dark:text-zinc-300 truncate">
-              Eksik kalan şablonları mevcut aya ekle:
+              {t('templates.syncBarText')}
             </span>
           </div>
 
@@ -271,11 +270,11 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
             {syncSuccessMsg ? (
               <>
                 <Check className="w-3.5 h-3.5 text-white" />
-                <span>Senkronize Edildi!</span>
+                <span>{t('templates.syncSuccess')}</span>
               </>
             ) : (
               <>
-                <span>Mevcut Aya Yansıt</span>
+                <span>{t('templates.syncBtn')}</span>
               </>
             )}
           </button>

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Person, Category, ExpenseItem, PersonId } from '@/types/budget';
 import { X, Check, CreditCard, Banknote, Edit2 } from 'lucide-react';
 import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
+import { useI18n } from '@/context/I18nContext';
 
 interface EditExpenseModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
   categories,
   onSaveExpense,
 }) => {
+  const { t, currencySymbol, translatePerson, translateCategory } = useI18n();
   const [amount, setAmount] = useState('');
   const [title, setTitle] = useState('');
   const [selectedPerson, setSelectedPerson] = useState<PersonId>('ortak');
@@ -76,7 +78,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
             <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
               <Edit2 className="w-3.5 h-3.5" />
             </div>
-            <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100">Harcamayı Düzenle</h3>
+            <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100">{t('modals.editExpenseTitle')}</h3>
           </div>
           <button
             onClick={onClose}
@@ -91,7 +93,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
           {/* Tutar Girişi */}
           <div>
             <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-              Tutar (₺) *
+              {t('modals.amountLabel')} ({currencySymbol}) *
             </label>
             <div className="relative">
               <input
@@ -105,7 +107,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                 className="w-full px-3.5 py-2.5 text-2xl font-bold text-zinc-900 dark:text-zinc-100 bg-white dark:bg-zinc-900 border-2 border-emerald-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400/20"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl font-bold text-zinc-400 dark:text-zinc-500">
-                ₺
+                {currencySymbol}
               </span>
             </div>
           </div>
@@ -113,7 +115,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
           {/* Harcayan Kişi */}
           <div>
             <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">
-              Harcamayı Yapan Kişi *
+              {t('modals.personLabel')}
             </label>
             <div className="grid grid-cols-2 gap-2">
               {persons.map(person => {
@@ -131,7 +133,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                   >
                     <div className="flex items-center gap-1.5">
                       <span className="text-base">{person.avatar}</span>
-                      <span>{person.name}</span>
+                      <span>{translatePerson(person)}</span>
                     </div>
                     {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />}
                   </button>
@@ -143,7 +145,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
           {/* Kategori Seçimi */}
           <div>
             <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">
-              Kategori *
+              {t('modals.categoryLabel')}
             </label>
             <div className="grid grid-cols-3 gap-1.5 max-h-36 overflow-y-auto p-1 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-950/40">
               {categories.map(cat => {
@@ -160,7 +162,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                     }`}
                   >
                     <span className="text-base">{cat.icon}</span>
-                    <span className="truncate w-full text-center">{cat.name}</span>
+                    <span className="truncate w-full text-center">{translateCategory(cat)}</span>
                   </button>
                 );
               })}
@@ -170,7 +172,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
           {/* Başlık / Açıklama */}
           <div>
             <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-              Açıklama / Yer
+              {t('modals.titleLabel')}
             </label>
             <input
               type="text"
@@ -185,7 +187,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-                Tarih
+                {t('modals.dateLabel')}
               </label>
               <input
                 type="date"
@@ -197,7 +199,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-                Ödeme Yöntemi
+                {t('modals.paymentMethodLabel')}
               </label>
               <div className="flex rounded-lg border border-zinc-300 dark:border-zinc-700 p-0.5 bg-zinc-100 dark:bg-zinc-800">
                 <button
@@ -209,7 +211,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                       : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200'
                   }`}
                 >
-                  <CreditCard className="w-3 h-3" /> Kart
+                  <CreditCard className="w-3 h-3" /> {t('variable.creditCard')}
                 </button>
                 <button
                   type="button"
@@ -220,7 +222,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                       : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200'
                   }`}
                 >
-                  <Banknote className="w-3 h-3" /> Nakit
+                  <Banknote className="w-3 h-3" /> {t('variable.cash')}
                 </button>
               </div>
             </div>
@@ -229,7 +231,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
           {/* Not */}
           <div>
             <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">
-              Özel Not (Opsiyonel)
+              {t('modals.noteLabel')}
             </label>
             <input
               type="text"
@@ -246,7 +248,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
               type="submit"
               className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-sm transition cursor-pointer"
             >
-              Değişiklikleri Kaydet
+              {t('modals.updateBtn')}
             </button>
           </div>
 

@@ -1,9 +1,8 @@
-'use client';
-
 import React, { useState } from 'react';
 import { MonthlyBudget, AppSettings } from '@/types/budget';
 import { Target, TrendingUp, Sparkles, AlertCircle, CheckCircle2, Edit3, ShieldCheck, Compass, PiggyBank } from 'lucide-react';
 import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
+import { useI18n } from '@/context/I18nContext';
 
 interface BudgetPlannerCardProps {
   budget: MonthlyBudget;
@@ -18,6 +17,7 @@ export const BudgetPlannerCard: React.FC<BudgetPlannerCardProps> = ({
   onUpdateBudgetLimit,
   onUpdateSavingsTarget,
 }) => {
+  const { t, formatMoney } = useI18n();
   const [isEditingLimit, setIsEditingLimit] = useState(false);
   const [limitInput, setLimitInput] = useState('');
 
@@ -70,9 +70,7 @@ export const BudgetPlannerCard: React.FC<BudgetPlannerCardProps> = ({
     setIsEditingSavings(false);
   };
 
-  const formatCurrency = (val: number) => {
-    return val.toLocaleString('tr-TR') + ' ₺';
-  };
+  const formatCurrency = (val: number) => formatMoney(val);
 
   return (
     <div className="space-y-5">
