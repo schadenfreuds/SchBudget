@@ -111,7 +111,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
 
       {/* Yeni Özel Şablon Ekleme Formu */}
       {isAddingCustom && (
-        <form onSubmit={handleSaveCustom} className="p-4 bg-zinc-50 dark:bg-zinc-850 border-b border-zinc-200 dark:border-zinc-800 space-y-3 text-xs">
+        <form onSubmit={handleSaveCustom} className="p-4 bg-zinc-50 dark:bg-zinc-800/80 border-b border-zinc-200 dark:border-zinc-800 space-y-3 text-xs">
           <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Yeni Hızlı Harcama Kısayolu Ekle</div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -200,7 +200,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
       )}
 
       {/* Şablon Kartları Grid */}
-      <div className="p-3 grid grid-cols-2 gap-2.5 overflow-y-auto max-h-[480px] flex-1">
+      <div className="p-3 pr-2 grid grid-cols-2 gap-2.5 overflow-y-auto max-h-[480px] flex-1 overscroll-contain">
         {templates.map(tpl => {
           const isJustAdded = justAddedId === tpl.id;
 

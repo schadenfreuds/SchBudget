@@ -221,7 +221,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
 
       {/* Yeni Fatura Ekleme Formu (Açılırsa) */}
       {isAdding && (
-        <form onSubmit={handleSaveNew} className="p-4 bg-zinc-50 dark:bg-zinc-850 border-b border-zinc-200 dark:border-zinc-800 space-y-3 text-xs">
+        <form onSubmit={handleSaveNew} className="p-4 bg-zinc-50 dark:bg-zinc-800/80 border-b border-zinc-200 dark:border-zinc-800 space-y-3 text-xs">
           <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Yeni Sabit Gider / Fatura Ekle</div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -321,7 +321,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
       )}
 
       {/* Liste */}
-      <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60 overflow-y-auto max-h-[480px] p-1 flex-1">
+      <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60 overflow-y-auto max-h-[480px] p-1 pr-1.5 flex-1 overscroll-contain">
         {filteredList.length === 0 ? (
           <div className="py-12 text-center">
             <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400 dark:text-zinc-500 mb-2">

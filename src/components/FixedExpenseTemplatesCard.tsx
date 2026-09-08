@@ -98,7 +98,7 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
 
       {/* Şablon Ekleme Formu */}
       {isAdding && (
-        <form onSubmit={handleAddTemplate} className="p-4 bg-zinc-50 dark:bg-zinc-850 border-b border-zinc-200 dark:border-zinc-800 space-y-3 text-xs">
+        <form onSubmit={handleAddTemplate} className="p-4 bg-zinc-50 dark:bg-zinc-800/80 border-b border-zinc-200 dark:border-zinc-800 space-y-3 text-xs">
           <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Yeni Rutin Şablon Ekle</div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -191,7 +191,7 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
       )}
 
       {/* Şablon Listesi */}
-      <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60 overflow-y-auto max-h-[480px] p-1 flex-1">
+      <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60 overflow-y-auto max-h-[480px] p-1 pr-1.5 flex-1 overscroll-contain">
         {templates.length === 0 ? (
           <div className="py-12 text-center text-xs text-zinc-400 dark:text-zinc-500">
             Kayıtlı rutin şablon bulunmuyor.
@@ -254,14 +254,19 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
 
       {/* Alt Bilgi & Bu Aya Aktar Butonu */}
       {onSyncMissingTemplatesToCurrentMonth && (
-        <div className="p-3 bg-zinc-50 dark:bg-zinc-850 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-2">
-          <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
-            Eksik kalan şablonları mevcut aya ekle:
-          </span>
+        <div className="p-3 bg-zinc-50 dark:bg-zinc-800/90 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-6 h-6 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <Sparkles className="w-3.5 h-3.5" />
+            </div>
+            <span className="text-[11px] font-medium text-zinc-600 dark:text-zinc-300 truncate">
+              Eksik kalan şablonları mevcut aya ekle:
+            </span>
+          </div>
 
           <button
             onClick={handleSync}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition cursor-pointer shadow-xs shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition cursor-pointer shadow-xs shrink-0 active:scale-95"
           >
             {syncSuccessMsg ? (
               <>
@@ -270,7 +275,6 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
               </>
             ) : (
               <>
-                <Sparkles className="w-3.5 h-3.5" />
                 <span>Mevcut Aya Yansıt</span>
               </>
             )}
