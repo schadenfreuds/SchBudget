@@ -7,37 +7,31 @@
 export function formatAmountInput(value: string): string {
   if (!value) return '';
 
-  // Kullanıcı sadece virgül veya nokta bastıysa "0," başlat
-  if (value === ',' || value === '.') return '0,';
+  // Kullanıcı sadece virgül bastıysa "0," başlat
+  if (value === ',') return '0,';
 
-  let hasDecimal = false;
-  let integerPart = '';
-  let decimalPart = '';
+  // 1. Önceki biçimlendirmeden kalan tüm noktaları (.) temizle (nokta binlik ayracıdır)
+  const withoutDots = value.replace(/\./g, '');
 
-  for (let i = 0; i < value.length; i++) {
-    const char = value[i];
-    if (char >= '0' && char <= '9') {
-      if (!hasDecimal) {
-        integerPart += char;
-      } else if (decimalPart.length < 2) {
-        // En fazla 2 ondalık hane (kuruş)
-        decimalPart += char;
-      }
-    } else if ((char === ',' || char === '.') && !hasDecimal) {
-      hasDecimal = true;
-    }
-  }
+  // 2. Virgül (ondalık) kontrolü
+  const hasComma = withoutDots.includes(',');
+  const parts = withoutDots.split(',');
+
+  // Tamsayı kısmı (sadece rakamlar)
+  let integerDigits = parts[0].replace(/[^\d]/g, '');
 
   // Baştaki fazlalık sıfırları temizle ("05" -> "5", ama "0" kalsın)
-  if (integerPart.length > 1 && integerPart.startsWith('0')) {
-    integerPart = integerPart.replace(/^0+/, '') || '0';
+  if (integerDigits.length > 1 && integerDigits.startsWith('0')) {
+    integerDigits = integerDigits.replace(/^0+/, '') || '0';
   }
 
   // Binlik basamaklara nokta koy
-  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const formattedInteger = integerDigits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-  if (hasDecimal) {
-    return `${formattedInteger || '0'},${decimalPart}`;
+  if (hasComma) {
+    // Ondalık kısım (en fazla 2 hane kuruş)
+    const decimalDigits = (parts[1] || '').replace(/[^\d]/g, '').slice(0, 2);
+    return `${formattedInteger || '0'},${decimalDigits}`;
   }
 
   return formattedInteger;
