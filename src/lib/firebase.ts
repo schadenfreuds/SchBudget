@@ -10,7 +10,7 @@ export function getFirebaseConfig() {
   if (typeof window === 'undefined') return null;
 
   // 1. Check window local storage custom config
-  const customConfig = localStorage.getItem('aile_butcesi_firebase_config');
+  const customConfig = localStorage.getItem('sch_budget_firebase_config') || localStorage.getItem('aile_butcesi_firebase_config');
   if (customConfig) {
     try {
       return JSON.parse(customConfig);

@@ -296,6 +296,7 @@ export default function Home() {
   const handleConnectFirebase = (configStr: string) => {
     try {
       const parsed = JSON.parse(configStr);
+      localStorage.setItem('sch_budget_firebase_config', JSON.stringify(parsed));
       localStorage.setItem('aile_butcesi_firebase_config', JSON.stringify(parsed));
       const db = initFirebase();
       setIsCloudConnected(!!db);
