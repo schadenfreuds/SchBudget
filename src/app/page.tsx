@@ -32,10 +32,12 @@ import { EditFixedExpenseModal } from '@/components/EditFixedExpenseModal';
 import { SettingsModal } from '@/components/SettingsModal';
 import { Plus, LayoutDashboard, ReceiptText, CalendarCheck, Target, Users } from 'lucide-react';
 
+import { DEFAULT_APP_SETTINGS } from '@/lib/constants';
+
 export default function Home() {
   const [currentMonth, setCurrentMonth] = useState<string>(() => getMonthKey());
-  const [settings, setSettingsState] = useState<AppSettings>(() => loadSettings());
-  const [budget, setBudget] = useState<MonthlyBudget>(() => loadLocalMonth(getMonthKey()));
+  const [settings, setSettingsState] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
+  const [budget, setBudget] = useState<MonthlyBudget>(() => getMockupMonthBudget(getMonthKey()));
   const [selectedPersonId, setSelectedPersonId] = useState<PersonId | 'all'>('all');
   const [isCloudConnected, setIsCloudConnected] = useState<boolean>(false);
   const [currentView, setCurrentView] = useState<AppView>('dashboard');
@@ -68,6 +70,10 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    // İstemcide mount tamamlandıktan sonra yerel ayarları senkronize et
+    const savedSettings = loadSettings();
+    setSettingsState(savedSettings);
+
     fetchMonthData(currentMonth);
 
     const db = initFirebase();

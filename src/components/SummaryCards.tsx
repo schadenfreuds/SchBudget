@@ -64,10 +64,10 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
               <ArrowUpRight className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 text-2xl sm:text-3xl font-bold text-zinc-900">
+          <div className="mt-2 text-2xl sm:text-3xl font-bold text-zinc-900" suppressHydrationWarning>
             {formatCurrency(totalIncome)}
           </div>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs text-zinc-500" suppressHydrationWarning>
             {budget.incomes.length > 0 ? `${budget.incomes.length} gelir kaydı` : 'Henüz gelir girilmedi'}
           </p>
         </div>
@@ -80,10 +80,10 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
               <ArrowDownRight className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 text-2xl sm:text-3xl font-bold text-zinc-900">
+          <div className="mt-2 text-2xl sm:text-3xl font-bold text-zinc-900" suppressHydrationWarning>
             {formatCurrency(totalExpense)}
           </div>
-          <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500">
+          <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500" suppressHydrationWarning>
             <span>Sabit: {formatCurrency(fixedTotal)}</span>
             <span>•</span>
             <span>Günlük: {formatCurrency(variableTotal)}</span>
@@ -102,7 +102,7 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
               <Wallet className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <div className="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight" suppressHydrationWarning>
             {formatCurrency(netBalance)}
           </div>
           <div className="mt-1 flex items-center gap-1.5 text-xs text-white/90">
