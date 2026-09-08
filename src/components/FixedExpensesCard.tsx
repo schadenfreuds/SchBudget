@@ -188,7 +188,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
 
             <div>
               <label className="block text-[11px] font-semibold text-zinc-700 mb-1">
-                Son Ödeme Günü (Ayın Kaçı)
+                Ödeme Günü
               </label>
               <input
                 type="number"
