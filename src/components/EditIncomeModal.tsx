@@ -47,7 +47,7 @@ export const EditIncomeModal: React.FC<EditIncomeModalProps> = ({
 
     onSaveIncome({
       ...income,
-      title: title.trim() || 'Gelir',
+      title: title.trim() || t('modals.defaultIncomeTitle'),
       amount: parsedAmount,
       personId: selectedPerson,
       date,
@@ -108,7 +108,7 @@ export const EditIncomeModal: React.FC<EditIncomeModalProps> = ({
             </label>
             <input
               type="text"
-              placeholder="Örn: Aylık Maaş, Kira Getirisi..."
+              placeholder={t('modals.incomePlaceholder')}
               value={title}
               onChange={e => setTitle(e.target.value)}
               className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
@@ -162,7 +162,7 @@ export const EditIncomeModal: React.FC<EditIncomeModalProps> = ({
             </label>
             <input
               type="text"
-              placeholder="Eklemek istediğiniz not..."
+              placeholder={t('modals.notePlaceholder')}
               value={note}
               onChange={e => setNote(e.target.value)}
               className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"

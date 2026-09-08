@@ -15,7 +15,7 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
   onSaveSettings,
   onSyncMissingTemplatesToCurrentMonth,
 }) => {
-  const { t, formatMoney } = useI18n();
+  const { t, formatMoney, translateCategory, translatePerson, translateTemplate } = useI18n();
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState('');
   const [expectedAmount, setExpectedAmount] = useState('');
@@ -98,17 +98,17 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
       {/* Şablon Ekleme Formu */}
       {isAdding && (
         <form onSubmit={handleAddTemplate} className="p-4 bg-zinc-50 dark:bg-zinc-800/80 border-b border-zinc-200 dark:border-zinc-800 space-y-3 text-xs">
-          <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Yeni Rutin Şablon Ekle</div>
+          <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">{t('templates.addTemplateTitle')}</div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                Fatura / Abonelik Adı *
+                {t('templates.nameLabel')}
               </label>
               <input
                 type="text"
                 required
-                placeholder="Örn: Netflix, İnternet, Aidat, Spor"
+                placeholder={t('templates.namePlaceholder')}
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs"
@@ -117,7 +117,7 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
 
             <div>
               <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                Varsayılan Aylık Tutar (₺)
+                {t('templates.defaultAmount')}
               </label>
               <input
                 type="text"
@@ -132,38 +132,38 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Kategori</label>
+              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">{t('templates.categoryLabel')}</label>
               <select
                 value={categoryId}
                 onChange={e => setCategoryId(e.target.value)}
                 className="w-full px-2 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs"
               >
                 {settings.categories.map(c => (
-                  <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                  <option key={c.id} value={c.id}>{c.icon} {translateCategory(c)}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Kime Ait?</label>
+              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">{t('templates.personLabel')}</label>
               <select
                 value={personId}
                 onChange={e => setPersonId(e.target.value)}
                 className="w-full px-2 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs"
               >
                 {settings.persons.map(p => (
-                  <option key={p.id} value={p.id}>{p.avatar} {p.name}</option>
+                  <option key={p.id} value={p.id}>{p.avatar} {translatePerson(p)}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Son Gün (1-31)</label>
+              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">{t('templates.dueDayLabel')}</label>
               <input
                 type="number"
                 min="1"
                 max="31"
-                placeholder="Örn: 15"
+                placeholder={t('templates.dueDayPlaceholder')}
                 value={dueDate}
                 onChange={e => setDueDate(e.target.value)}
                 className="w-full px-2 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs"
@@ -177,13 +177,13 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
               onClick={() => setIsAdding(false)}
               className="px-3 py-1 rounded border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
             >
-              Vazgeç
+              {t('templates.cancelBtn')}
             </button>
             <button
               type="submit"
               className="px-3.5 py-1 rounded bg-amber-600 text-white font-bold hover:bg-amber-700 transition cursor-pointer"
             >
-              Kaydet
+              {t('templates.saveBtn')}
             </button>
           </div>
         </form>
@@ -193,7 +193,7 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
       <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60 overflow-y-auto max-h-[480px] p-1 pr-1.5 flex-1 overscroll-contain">
         {templates.length === 0 ? (
           <div className="py-12 text-center text-xs text-zinc-400 dark:text-zinc-500">
-            Kayıtlı rutin şablon bulunmuyor.
+            {t('templates.noTemplates')}
           </div>
         ) : (
           templates.map((tpl, idx) => {
@@ -207,9 +207,11 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100 truncate">{tpl.title}</span>
+                    <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100 truncate">
+                      {translateTemplate(tpl.title)}
+                    </span>
                     {category && (
-                      <span className="text-xs text-zinc-400 dark:text-zinc-500" title={category.name}>
+                      <span className="text-xs text-zinc-400 dark:text-zinc-500" title={translateCategory(category)}>
                         {category.icon}
                       </span>
                     )}
@@ -218,14 +220,14 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
                     {person && (
                       <span className="inline-flex items-center gap-1">
                         <span>{person.avatar}</span>
-                        <span className="text-zinc-600 dark:text-zinc-300">{person.name}</span>
+                        <span className="text-zinc-600 dark:text-zinc-300">{translatePerson(person)}</span>
                       </span>
                     )}
                     {tpl.dueDate && (
                       <>
                         <span>•</span>
                         <span className="inline-flex items-center gap-0.5 text-zinc-400 dark:text-zinc-500">
-                          <Calendar className="w-3 h-3" /> Her ayın {tpl.dueDate}&apos;si
+                          <Calendar className="w-3 h-3" /> {t('templates.dueDayFormat').replace('{day}', String(tpl.dueDate))}
                         </span>
                       </>
                     )}
@@ -240,7 +242,7 @@ export const FixedExpenseTemplatesCard: React.FC<FixedExpenseTemplatesCardProps>
                   <button
                     onClick={() => handleDeleteTemplate(idx)}
                     className="text-zinc-300 dark:text-zinc-600 hover:text-rose-600 dark:hover:text-rose-400 p-1 transition cursor-pointer"
-                    title="Şablonu sil"
+                    title={t('templates.deleteTooltip')}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

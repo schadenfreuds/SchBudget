@@ -20,7 +20,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
   onOpenWithPreset,
   onSaveSettings,
 }) => {
-  const { t, formatMoney, currencySymbol, translateCategory } = useI18n();
+  const { t, formatMoney, currencySymbol, translateCategory, translateQuick } = useI18n();
   const [isAddingCustom, setIsAddingCustom] = useState(false);
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
@@ -114,7 +114,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
               <input
                 type="text"
                 required
-                placeholder="Örn: Simit & Ayran, Otopark"
+                placeholder={t('quick.titlePlaceholder')}
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs"
@@ -122,7 +122,9 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">{t('quick.amountLabel')} ({currencySymbol}) *</label>
+              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
+                {t('quick.amountLabel')} ({currencySymbol})
+              </label>
               <input
                 type="text"
                 inputMode="decimal"
@@ -135,7 +137,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">{t('quick.categoryLabel')}</label>
               <select
@@ -150,28 +152,53 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">İkon</label>
-              <select
-                value={icon}
-                onChange={e => setIcon(e.target.value)}
-                className="w-full px-2 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-base"
-              >
-                {PRESET_ICONS.map(i => (
-                  <option key={i} value={i}>{i}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
               <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">{t('quick.methodLabel')}</label>
-              <select
-                value={paymentMethod}
-                onChange={e => setPaymentMethod(e.target.value as 'kredi_karti' | 'nakit')}
-                className="w-full px-2 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs"
-              >
-                <option value="kredi_karti">💳 {t('variable.creditCard')}</option>
-                <option value="nakit">💵 {t('variable.cash')}</option>
-              </select>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('kredi_karti')}
+                  className={`flex-1 py-1.5 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1 transition cursor-pointer ${
+                    paymentMethod === 'kredi_karti'
+                      ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-200'
+                      : 'border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400'
+                  }`}
+                >
+                  <CreditCard className="w-3.5 h-3.5" />
+                  <span>{t('quick.card')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('nakit')}
+                  className={`flex-1 py-1.5 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1 transition cursor-pointer ${
+                    paymentMethod === 'nakit'
+                      ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-200'
+                      : 'border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400'
+                  }`}
+                >
+                  <Banknote className="w-3.5 h-3.5" />
+                  <span>{t('quick.cash')}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">İkon Seçin</label>
+            <div className="flex flex-wrap gap-1.5">
+              {PRESET_ICONS.map(emoji => (
+                <button
+                  key={emoji}
+                  type="button"
+                  onClick={() => setIcon(emoji)}
+                  className={`w-8 h-8 rounded-lg text-sm flex items-center justify-center border transition cursor-pointer ${
+                    icon === emoji
+                      ? 'border-amber-500 bg-amber-100 dark:bg-amber-900/60 ring-1 ring-amber-400'
+                      : 'border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  {emoji}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -194,8 +221,8 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
       )}
 
       {/* Şablon Kartları Grid */}
-      <div className="p-3 pr-2 grid grid-cols-2 gap-2.5 overflow-y-auto max-h-[480px] flex-1 overscroll-contain">
-        {templates.map(tpl => {
+      <div className="p-3 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-2.5 overflow-y-auto max-h-[480px] flex-1">
+        {templates.map((tpl) => {
           const isJustAdded = justAddedId === tpl.id;
 
           return (
@@ -226,7 +253,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
                         });
                       }}
                       className="p-1 rounded text-zinc-300 dark:text-zinc-600 hover:text-zinc-600 dark:hover:text-zinc-300 opacity-0 group-hover:opacity-100 transition"
-                      title="Tutarı değiştirerek aç"
+                      title={t('quick.openPresetTitle')}
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                     </button>
@@ -237,7 +264,7 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
                       type="button"
                       onClick={(e) => handleDeleteTemplate(tpl.id, e)}
                       className="p-1 rounded text-zinc-300 dark:text-zinc-600 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition"
-                      title="Şablonu sil"
+                      title={t('quick.deleteTemplate')}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -248,14 +275,14 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
               {/* Orta: Başlık */}
               <div className="mt-2.5">
                 <div className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 truncate">
-                  {tpl.title}
+                  {translateQuick(tpl.title)}
                 </div>
                 <div className="flex items-center gap-1.5 mt-1">
                   <span className="text-sm sm:text-base font-extrabold text-emerald-600 dark:text-emerald-400">
                     {formatMoney(tpl.amount)}
                   </span>
                   <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
-                    {tpl.paymentMethod === 'nakit' ? '💵 Nakit' : '💳 Kart'}
+                    {tpl.paymentMethod === 'nakit' ? t('quick.cash') : t('quick.card')}
                   </span>
                 </div>
               </div>
@@ -264,11 +291,11 @@ export const QuickExpensesCard: React.FC<QuickExpensesCardProps> = ({
               <div className="mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[10px]">
                 {isJustAdded ? (
                   <span className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
-                    <Check className="w-3 h-3" /> Eklendi!
+                    <Check className="w-3 h-3" /> {t('quick.addedSuccess')}
                   </span>
                 ) : (
                   <span className="text-zinc-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 font-medium transition flex items-center gap-1">
-                    <Plus className="w-3 h-3" /> Dokun ve Ekle
+                    <Plus className="w-3 h-3" /> {t('quick.tapToAdd')}
                   </span>
                 )}
               </div>

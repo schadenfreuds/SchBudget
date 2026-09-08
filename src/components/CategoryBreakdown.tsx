@@ -73,7 +73,7 @@ export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
               onClick={onGoToAccounting}
               className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold hover:underline flex items-center gap-1 cursor-pointer"
             >
-              <span>Muhasebe Detayı</span>
+              <span>{t('category.viewDetails')}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           )}

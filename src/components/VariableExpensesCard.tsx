@@ -22,7 +22,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
   onEditExpense,
   onOpenAddExpense,
 }) => {
-  const { t, formatMoney, translateCategory, translatePerson } = useI18n();
+  const { t, lang, formatMoney, translateCategory, translatePerson, translateQuick } = useI18n();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [paymentFilter, setPaymentFilter] = useState<'all' | 'kredi_karti' | 'nakit'>('all');
@@ -54,7 +54,8 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
   const formatDateLabel = (dateStr: string) => {
     try {
       const d = new Date(dateStr);
-      return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+      const locale = lang === 'en' ? 'en-US' : 'tr-TR';
+      return d.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
     } catch {
       return dateStr;
     }
@@ -92,7 +93,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
             <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
             <input
               type="text"
-              placeholder="Harcama ara (Migros, benzin, eczane...)"
+              placeholder={t('variable.searchPlaceholder')}
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
@@ -105,9 +106,9 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
               onChange={e => setSelectedCategory(e.target.value)}
               className="w-full sm:w-auto px-2 py-1.5 text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 truncate"
             >
-              <option value="all">Tüm Kategoriler</option>
+              <option value="all">{t('variable.allCategories')}</option>
               {categories.map(c => (
-                <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                <option key={c.id} value={c.id}>{c.icon} {translateCategory(c)}</option>
               ))}
             </select>
 
@@ -116,9 +117,9 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
               onChange={e => setPaymentFilter(e.target.value as 'all' | 'kredi_karti' | 'nakit')}
               className="w-full sm:w-auto px-2 py-1.5 text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 truncate"
             >
-              <option value="all">💳/💵 Tümü</option>
-              <option value="kredi_karti">💳 Kredi Kartı</option>
-              <option value="nakit">💵 Nakit / Banka</option>
+              <option value="all">{t('variable.allPayments')}</option>
+              <option value="kredi_karti">{t('variable.cardPayment')}</option>
+              <option value="nakit">{t('variable.cashPayment')}</option>
             </select>
           </div>
         </div>
@@ -131,12 +132,12 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
             <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400 dark:text-zinc-500 mb-2">
               <ShoppingBag className="w-5 h-5" />
             </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Bu kriterde harcama bulunamadı.</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{t('variable.noExpensesFound')}</p>
             <button
               onClick={onOpenAddExpense}
               className="mt-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
             >
-              Hemen yeni bir harcama ekle
+              {t('variable.addExpenseNow')}
             </button>
           </div>
         ) : (
@@ -158,7 +159,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="text-xs sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
-                        {expense.title}
+                        {translateQuick(expense.title)}
                       </span>
                       {expense.note && (
                         <span className="text-[11px] text-zinc-400 dark:text-zinc-500 truncate max-w-[100px]" title={expense.note}>
@@ -175,12 +176,12 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
                       {person && (
                         <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded font-medium border text-[10px] ${person.color}`}>
                           <span>{person.avatar}</span>
-                          <span>{person.name}</span>
+                          <span>{translatePerson(person)}</span>
                         </span>
                       )}
                       <span>•</span>
                       <span className="text-zinc-500 dark:text-zinc-400">
-                        {category?.name || 'Diğer'}
+                        {category ? translateCategory(category) : t('categories.diger')}
                       </span>
                       {expense.paymentMethod && (
                         <>
@@ -188,11 +189,11 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
                           <span className="inline-flex items-center gap-0.5 text-zinc-400 dark:text-zinc-500">
                             {expense.paymentMethod === 'kredi_karti' ? (
                               <span className="flex items-center gap-0.5 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-1 rounded text-[10px] font-medium">
-                                <CreditCard className="w-3 h-3" /> Kart
+                                <CreditCard className="w-3 h-3" /> {t('variable.creditCard')}
                               </span>
                             ) : (
                               <span className="flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-1 rounded text-[10px] font-medium">
-                                <Banknote className="w-3 h-3" /> Nakit
+                                <Banknote className="w-3 h-3" /> {t('variable.cash')}
                               </span>
                             )}
                           </span>
@@ -212,7 +213,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
                     <button
                       onClick={() => onEditExpense(expense)}
                       className="text-zinc-400 dark:text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 p-1 rounded-md transition cursor-pointer"
-                      title="Harcamayı düzenle"
+                      title={t('common.edit')}
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
@@ -220,7 +221,7 @@ export const VariableExpensesCard: React.FC<VariableExpensesCardProps> = ({
                     <button
                       onClick={() => onDeleteExpense(expense.id)}
                       className="text-zinc-300 dark:text-zinc-600 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 p-1 rounded-md transition cursor-pointer"
-                      title="Harcamayı sil"
+                      title={t('common.delete')}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

@@ -39,7 +39,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'persons' | 'categories' | 'theme' | 'backup' | 'cloud' | 'devtools'>('persons');
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>('system');
-  const { t, lang, setLang, currency, setCurrency } = useI18n();
+  const { t, lang, setLang, currency, setCurrency, translateCategory, translatePerson, translateRole } = useI18n();
 
   useEffect(() => {
     if (isOpen) {
@@ -145,20 +145,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
       const res = restoreBackupFile(content);
       if (res.success) {
-        setRestoreStatus(`✓ Başarılı! ${res.count || 0} adet ay ve ayarlar geri yüklendi.`);
+        setRestoreStatus(t('settings.backup.restoreSuccess').replace('{count}', String(res.count || 0)));
         if (onDataRestored) onDataRestored();
         setTimeout(() => {
           window.location.reload();
         }, 1500);
       } else {
-        setRestoreStatus(`❌ Hata: ${res.error || 'Yedek yüklenemedi.'}`);
+        setRestoreStatus(`❌ ${res.error || 'Failed to restore'}`);
       }
     };
     reader.readAsText(file);
   };
 
   const handleResetData = async () => {
-    if (window.confirm('DİKKAT: Tarayıcınızdaki tüm geçmiş aylar, gelirler, harcamalar ve ayarlar kalıcı olarak silinecek ve tertemiz bir sayfa açılacaktır.\n\nSıfırlamak istediğinize emin misiniz?')) {
+    const confirmText = lang === 'en'
+      ? 'WARNING: All past months, incomes, expenses, and settings stored in this browser will be permanently cleared.\n\nAre you sure you want to reset all data?'
+      : 'DİKKAT: Tarayıcınızdaki tüm geçmiş aylar, gelirler, harcamalar ve ayarlar kalıcı olarak silinecek ve tertemiz bir sayfa açılacaktır.\n\nSıfırlamak istediğinize emin misiniz?';
+
+    if (window.confirm(confirmText)) {
       if (onResetAllData) {
         await onResetAllData();
       } else {
@@ -196,8 +200,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-        {/* Sekmeler */}
-        <div className="flex border-b border-zinc-200 dark:border-zinc-800 px-5 pt-2 gap-2 text-xs font-semibold overflow-x-auto">
+        {/* Sekmeler - Windows Chrome'da yatay scrollbar çıkmaması için no-scrollbar eklendi */}
+        <div className="flex border-b border-zinc-200 dark:border-zinc-800 px-5 pt-2 gap-2 text-xs font-semibold overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('persons')}
             className={`pb-2.5 transition border-b-2 cursor-pointer flex items-center gap-1.5 shrink-0 ${
@@ -278,15 +282,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {activeTab === 'persons' && (
             <div className="space-y-4">
               <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 p-3 rounded-xl text-emerald-800 dark:text-emerald-300">
-                <p className="font-semibold">Aile Bireyleri & Ortak Ev Masrafları</p>
+                <p className="font-semibold">{t('settings.persons.bannerTitle')}</p>
                 <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
-                  Evdeki bireyleri ekleyin veya düzenleyin. Her harcama ve gelir bu kişilere bağlanır.
+                  {t('settings.persons.bannerDesc')}
                 </p>
               </div>
 
               {/* Kişi Listesi */}
               <div className="space-y-2">
-                <label className="font-bold text-zinc-800 dark:text-zinc-200 block text-xs">Mevcut Kişiler</label>
+                <label className="font-bold text-zinc-800 dark:text-zinc-200 block text-xs">{t('settings.persons.currentPersons')}</label>
                 <div className="divide-y divide-zinc-100 dark:divide-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden bg-white dark:bg-zinc-800/80">
                   {persons.map(p => (
                     <div key={p.id} className="p-3 flex items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">
@@ -296,10 +300,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         </span>
                         <div>
                           <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm flex items-center gap-2">
-                            <span>{p.name}</span>
+                            <span>{translatePerson(p)}</span>
                             {p.role && (
                               <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">
-                                {p.role}
+                                {translateRole(p.role)}
                               </span>
                             )}
                           </div>
@@ -312,7 +316,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           type="button"
                           onClick={() => handleDeletePerson(p.id)}
                           className="text-zinc-300 dark:text-zinc-600 hover:text-rose-600 dark:hover:text-rose-400 p-1.5 rounded-lg transition cursor-pointer"
-                          title="Kişiyi kaldır"
+                          title={t('settings.persons.deleteTooltip')}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -326,26 +330,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <form onSubmit={handleAddPerson} className="bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-800 p-4 rounded-xl space-y-3">
                 <div className="font-bold text-zinc-800 dark:text-zinc-200 text-xs flex items-center gap-1.5">
                   <Plus className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span>Yeni Birey Ekle</span>
+                  <span>{t('settings.persons.addNew')}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mb-1">İsim *</label>
+                    <label className="block text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mb-1">{t('settings.persons.nameLabel')}</label>
                     <input
                       type="text"
                       required
-                      placeholder="Örn: Can, Ece, Ali..."
+                      placeholder={t('settings.persons.namePlaceholder')}
                       value={newPersonName}
                       onChange={e => setNewPersonName(e.target.value)}
                       className="w-full px-3 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg text-xs text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mb-1">Rol / Açıklama</label>
+                    <label className="block text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mb-1">{t('settings.persons.roleLabel')}</label>
                     <input
                       type="text"
-                      placeholder="Örn: Abi, Kardeş, Ev Arkadaşı..."
+                      placeholder={t('settings.persons.rolePlaceholder')}
                       value={newPersonRole}
                       onChange={e => setNewPersonRole(e.target.value)}
                       className="w-full px-3 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg text-xs text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
@@ -354,7 +358,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">Avatar Seçimi</label>
+                  <label className="block text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">{t('settings.persons.avatarSelect')}</label>
                   <div className="flex gap-2">
                     {AVATAR_OPTIONS.map(emoji => (
                       <button
@@ -376,7 +380,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     type="submit"
                     className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition cursor-pointer shadow-xs"
                   >
-                    Kişiyi Ekle
+                    {t('settings.persons.addBtn')}
                   </button>
                 </div>
               </form>
@@ -387,9 +391,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {activeTab === 'categories' && (
             <div className="space-y-4">
               <div className="bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-900/40 p-3 rounded-xl text-sky-900 dark:text-sky-300">
-                <p className="font-semibold">Harcama Kategorileri</p>
+                <p className="font-semibold">{t('settings.categories.bannerTitle')}</p>
                 <p className="text-[11px] text-sky-800 dark:text-sky-400 mt-0.5">
-                  Ev bütçenize göre dilediğiniz kategoriyi ekleyin veya özelleştirin.
+                  {t('settings.categories.bannerDesc')}
                 </p>
               </div>
 
@@ -398,14 +402,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div key={cat.id} className="p-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-800/80 flex items-center justify-between">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-base">{cat.icon}</span>
-                      <span className="font-semibold text-zinc-800 dark:text-zinc-200 truncate text-[11px]">{cat.name}</span>
+                      <span className="font-semibold text-zinc-800 dark:text-zinc-200 truncate text-[11px]">{translateCategory(cat)}</span>
                     </div>
                     {categories.length > 3 && (
                       <button
                         type="button"
                         onClick={() => handleDeleteCategory(cat.id)}
                         className="text-zinc-300 dark:text-zinc-600 hover:text-rose-600 dark:hover:text-rose-400 p-1 transition cursor-pointer shrink-0"
-                        title="Kategoriyi sil"
+                        title={t('settings.categories.deleteTooltip')}
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -418,7 +422,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <form onSubmit={handleAddCategory} className="bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-800 p-3.5 rounded-xl space-y-3">
                 <div className="font-bold text-zinc-800 dark:text-zinc-200 text-xs flex items-center gap-1.5">
                   <Plus className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span>Yeni Kategori Ekle</span>
+                  <span>{t('settings.categories.addNew')}</span>
                 </div>
 
                 <div className="flex gap-2">
@@ -426,7 +430,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <input
                       type="text"
                       required
-                      placeholder="Örn: Evcil Hayvan, Eğlence, Hobi..."
+                      placeholder={t('settings.categories.namePlaceholder')}
                       value={newCatName}
                       onChange={e => setNewCatName(e.target.value)}
                       className="w-full px-3 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg text-xs text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
@@ -447,7 +451,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     type="submit"
                     className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition cursor-pointer shrink-0"
                   >
-                    Ekle
+                    {t('settings.categories.addBtn')}
                   </button>
                 </div>
               </form>
@@ -613,7 +617,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           {c.symbol}
                         </div>
                         <div className="text-[11px] font-bold mt-0.5">{cCode}</div>
-                        <div className="text-[9px] text-zinc-400 dark:text-zinc-500">{c.name}</div>
+                        <div className="text-[9px] text-zinc-400 dark:text-zinc-500">{lang === 'en' ? c.enName : c.name}</div>
                       </button>
                     );
                   })}
@@ -628,11 +632,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-800 p-3.5 rounded-xl space-y-1">
                 <div className="font-bold text-zinc-900 dark:text-zinc-100 text-xs flex items-center gap-1.5">
                   <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  <span>Çevrimdışı JSON Yedekleme (Data Portability)</span>
+                  <span>{t('settings.backup.bannerTitle')}</span>
                 </div>
                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                  Tüm ay verilerini ve ayarlarınızı tek dosya halinde bilgisayarınıza veya telefonunuza indirin.
-                  İnternet veya hesap gerektirmez.
+                  {t('settings.backup.bannerDesc')}
                 </p>
                 <div className="pt-2">
                   <button
@@ -641,7 +644,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition cursor-pointer shadow-xs"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>Yedek Dosyasını İndir (.json)</span>
+                    <span>{t('settings.backup.downloadBtn')}</span>
                   </button>
                 </div>
               </div>
@@ -649,10 +652,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-800 p-3.5 rounded-xl space-y-2">
                 <div className="font-bold text-zinc-900 dark:text-zinc-100 text-xs flex items-center gap-1.5">
                   <Upload className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                  <span>Yedekten Geri Yükle</span>
+                  <span>{t('settings.backup.restoreTitle')}</span>
                 </div>
                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                  Daha önce indirdiğiniz `.json` yedek dosyasını seçerek tüm verilerinizi geri getirin.
+                  {t('settings.backup.restoreDesc')}
                 </p>
 
                 <input
@@ -670,7 +673,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition cursor-pointer shadow-xs"
                   >
                     <Upload className="w-3.5 h-3.5" />
-                    <span>JSON Dosyası Seç ve Yükle</span>
+                    <span>{t('settings.backup.restoreBtn')}</span>
                   </button>
                 </div>
 
@@ -684,10 +687,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="bg-rose-50/60 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 p-3.5 rounded-xl space-y-1">
                 <div className="font-bold text-rose-800 dark:text-rose-300 text-xs flex items-center gap-1.5">
                   <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-                  <span>Tüm Verileri Sıfırla</span>
+                  <span>{t('settings.backup.resetTitle')}</span>
                 </div>
                 <p className="text-[11px] text-rose-700 dark:text-rose-400">
-                  Bu tarayıcıdaki tüm bütçe kayıtlarını ve ayarları sıfırlayarak temiz bir sayfa açar.
+                  {t('settings.backup.resetDesc')}
                 </p>
                 <div className="pt-1">
                   <button
@@ -695,7 +698,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={handleResetData}
                     className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold transition cursor-pointer"
                   >
-                    Verileri Tamamen Temizle
+                    {t('settings.backup.resetBtn')}
                   </button>
                 </div>
               </div>
@@ -708,16 +711,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 p-3 rounded-xl text-emerald-800 dark:text-emerald-300">
                 <div className="flex items-center gap-2 font-bold text-xs">
                   <Cloud className="w-4 h-4" />
-                  <span>Durum: {isCloudConnected ? '🟢 Bulut Bağlı (Canlı Senkronizasyon)' : '⚪ Yerel Mod (Sadece Bu Cihazda)'}</span>
+                  <span>{t('settings.cloud.statusLabel')} {isCloudConnected ? t('settings.cloud.statusConnected') : t('settings.cloud.statusLocal')}</span>
                 </div>
                 <p className="text-[11px] mt-1 text-emerald-700 dark:text-emerald-400">
-                  Telefon ve bilgisayarınız arasında anlık senkronizasyon için ücretsiz Firebase Firestore projenizin JSON yapılandırmasını buraya yapıştırabilirsiniz.
+                  {t('settings.cloud.desc')}
                 </p>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                  Firebase Yapılandırma JSON
+                  {t('settings.cloud.jsonLabel')}
                 </label>
                 <textarea
                   rows={6}
@@ -731,7 +734,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="flex items-center justify-between pt-1">
                 {cloudSuccessMsg ? (
                   <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                    <Check className="w-4 h-4" /> Bağlantı kaydedildi!
+                    <Check className="w-4 h-4" /> {t('settings.cloud.saveSuccess')}
                   </span>
                 ) : <span />}
 
@@ -740,7 +743,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onClick={handleSaveFirebase}
                   className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition cursor-pointer shadow-xs"
                 >
-                  Bulutu Bağla ve Senkronize Et
+                  {t('settings.cloud.saveBtn')}
                 </button>
               </div>
             </div>
@@ -752,18 +755,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 p-3.5 rounded-xl text-amber-900 dark:text-amber-300 space-y-1">
                 <div className="font-bold flex items-center gap-1.5 text-xs">
                   <Wrench className="w-4 h-4 text-amber-700 dark:text-amber-400" />
-                  <span>Geliştirici & Test Araçları</span>
+                  <span>{t('settings.devtools.bannerTitle')}</span>
                 </div>
                 <p className="text-[11px] text-amber-800 dark:text-amber-400">
-                  Uygulamanın grafiklerini, analizlerini ve çift sekme düzenini test etmek için mevcut aya gerçekçi 1 aylık örnek aile verisi (Kira, faturalar, maaşlar, Migros, kasap vb.) yükler.
+                  {t('settings.devtools.bannerDesc')}
                 </p>
               </div>
 
               {onLoadMockup && (
                 <div className="p-3 bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl flex items-center justify-between">
                   <div>
-                    <div className="font-bold text-zinc-900 dark:text-zinc-100">Gerçekçi Demo Verisi Yükle</div>
-                    <div className="text-[11px] text-zinc-500 dark:text-zinc-400">Mevcut ayı temsili verilerle doldurur</div>
+                    <div className="font-bold text-zinc-900 dark:text-zinc-100">{t('settings.devtools.mockupTitle')}</div>
+                    <div className="text-[11px] text-zinc-500 dark:text-zinc-400">{t('settings.devtools.mockupDesc')}</div>
                   </div>
                   <button
                     type="button"
@@ -773,7 +776,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     }}
                     className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg transition cursor-pointer shadow-xs"
                   >
-                    Demoyu Yükle
+                    {t('settings.devtools.mockupBtn')}
                   </button>
                 </div>
               )}

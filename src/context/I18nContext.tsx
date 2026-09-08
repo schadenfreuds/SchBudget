@@ -10,6 +10,9 @@ import {
   formatMonthDisplay,
   getCategoryName,
   getPersonName,
+  translateTemplateTitle,
+  translateQuickTitle,
+  translatePersonRole,
 } from '@/lib/i18n';
 
 interface I18nContextType {
@@ -23,6 +26,9 @@ interface I18nContextType {
   formatMonth: (monthKey: string) => string;
   translateCategory: (cat: { id: string; name: string }) => string;
   translatePerson: (p: { id: string; name: string }) => string;
+  translateTemplate: (title: string) => string;
+  translateQuick: (title: string) => string;
+  translateRole: (role?: string) => string | undefined;
 }
 
 const I18nContext = createContext<I18nContextType | null>(null);
@@ -87,6 +93,9 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const formatMonth = (monthKey: string) => formatMonthDisplay(monthKey, lang);
   const translateCategory = (cat: { id: string; name: string }) => getCategoryName(cat, lang);
   const translatePerson = (p: { id: string; name: string }) => getPersonName(p, lang);
+  const translateTemplate = (title: string) => translateTemplateTitle(title, lang);
+  const translateQuick = (title: string) => translateQuickTitle(title, lang);
+  const translateRole = (role?: string) => translatePersonRole(role, lang);
 
   return (
     <I18nContext.Provider
@@ -101,6 +110,9 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
         formatMonth,
         translateCategory,
         translatePerson,
+        translateTemplate,
+        translateQuick,
+        translateRole,
       }}
     >
       {children}

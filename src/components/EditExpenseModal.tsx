@@ -52,7 +52,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
     if (!parsedAmount || parsedAmount <= 0) return;
 
     const categoryObj = categories.find(c => c.id === selectedCategory);
-    const finalTitle = title.trim() || categoryObj?.name || 'Harcama';
+    const finalTitle = title.trim() || (categoryObj ? translateCategory(categoryObj) : t('modals.defaultExpenseTitle'));
 
     onSaveExpense({
       ...expense,
@@ -176,7 +176,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
             </label>
             <input
               type="text"
-              placeholder="Örn: Migros haftalık alışveriş..."
+              placeholder={t('modals.expensePlaceholder')}
               value={title}
               onChange={e => setTitle(e.target.value)}
               className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"

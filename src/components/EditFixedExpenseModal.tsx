@@ -97,7 +97,7 @@ export const EditFixedExpenseModal: React.FC<EditFixedExpenseModalProps> = ({
             <input
               type="text"
               required
-              placeholder="Örn: Elektrik Faturası, Kira, Aidat..."
+              placeholder={t('modals.fixedPlaceholder')}
               value={title}
               onChange={e => setTitle(e.target.value)}
               className="w-full px-3 py-2 text-sm font-semibold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
@@ -135,7 +135,7 @@ export const EditFixedExpenseModal: React.FC<EditFixedExpenseModalProps> = ({
                   type="number"
                   min="1"
                   max="31"
-                  placeholder="Örn: 15"
+                  placeholder={t('modals.duePlaceholder')}
                   value={dueDate}
                   onChange={e => setDueDate(e.target.value)}
                   className="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
@@ -209,7 +209,7 @@ export const EditFixedExpenseModal: React.FC<EditFixedExpenseModalProps> = ({
             </label>
             <input
               type="text"
-              placeholder="Abone no, otomatik ödeme talimatı vb..."
+              placeholder={t('modals.billNotePlaceholder')}
               value={note}
               onChange={e => setNote(e.target.value)}
               className="w-full px-3 py-2 text-xs bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"

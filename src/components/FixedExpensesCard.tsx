@@ -27,7 +27,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
   onAddFixedExpense,
   onEditFixedExpense,
 }) => {
-  const { t, formatMoney, currencySymbol } = useI18n();
+  const { t, formatMoney, translateCategory, translatePerson, translateTemplate } = useI18n();
   const [isAdding, setIsAdding] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newAmount, setNewAmount] = useState('');
@@ -40,16 +40,20 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'unpaid' | 'paid'>('all');
 
-  // Inline tutar düzenleme
+  // Hızlı düzenleme için ID
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editAmountVal, setEditAmountVal] = useState('');
 
-  // Filtreleme
-  const filteredList = fixedExpenses.filter(f => {
+  // Filtrelenmiş liste
+  const filteredList = fixedExpenses.filter((f) => {
+    // Kişi filtresi
     if (selectedPersonId !== 'all' && f.personId !== selectedPersonId) return false;
+    // Kategori filtresi
     if (selectedCategory !== 'all' && f.categoryId !== selectedCategory) return false;
+    // Durum filtresi
     if (statusFilter === 'unpaid' && f.isPaid) return false;
     if (statusFilter === 'paid' && !f.isPaid) return false;
+    // Arama filtresi
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       const matchTitle = f.title.toLowerCase().includes(term);
@@ -105,14 +109,14 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
     if (item.isPaid) {
       return (
         <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-          ✓ Ödendi
+          {t('fixed.statusPaid')}
         </span>
       );
     }
     if (!item.dueDate) {
       return (
         <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
-          <Clock className="w-2.5 h-2.5" /> Bekliyor
+          <Clock className="w-2.5 h-2.5" /> {t('fixed.statusPending')}
         </span>
       );
     }
@@ -123,25 +127,25 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
     if (diff < 0) {
       return (
         <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/50 px-2 py-0.5 rounded-full border border-rose-300 dark:border-rose-800">
-          🚨 {Math.abs(diff)} gün gecikti!
+          {t('fixed.statusOverdue').replace('{days}', String(Math.abs(diff)))}
         </span>
       );
     } else if (diff === 0) {
       return (
         <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-900 dark:text-amber-200 bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 rounded-full border border-amber-300 dark:border-amber-700">
-          ⚠️ Bugün son gün!
+          {t('fixed.statusDueToday')}
         </span>
       );
     } else if (diff <= 3) {
       return (
         <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
-          ⏳ {diff} gün kaldı
+          {t('fixed.statusDaysLeft').replace('{days}', String(diff))}
         </span>
       );
     } else {
       return (
         <span className="inline-flex items-center gap-1 text-[10px] font-medium text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-700">
-          🗓️ Ayın {item.dueDate}&apos;si
+          {t('fixed.dayOfMonth').replace('{day}', String(item.dueDate))}
         </span>
       );
     }
@@ -179,7 +183,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
             <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" />
             <input
               type="text"
-              placeholder="Fatura ara (Kira, elektrik, internet...)"
+              placeholder={t('fixed.searchPlaceholder')}
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
@@ -192,9 +196,9 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
               onChange={e => setSelectedCategory(e.target.value)}
               className="w-full sm:w-auto px-2 py-1.5 text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 truncate"
             >
-              <option value="all">Tüm Kategoriler</option>
+              <option value="all">{t('fixed.allCategories')}</option>
               {categories.map(c => (
-                <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                <option key={c.id} value={c.id}>{c.icon} {translateCategory(c)}</option>
               ))}
             </select>
 
@@ -203,9 +207,9 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
               onChange={e => setStatusFilter(e.target.value as 'all' | 'unpaid' | 'paid')}
               className="w-full sm:w-auto px-2 py-1.5 text-xs bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 truncate"
             >
-              <option value="all">Tüm Durumlar</option>
-              <option value="unpaid">⏳ Bekleyenler</option>
-              <option value="paid">✓ Ödenenler</option>
+              <option value="all">{t('fixed.allStatuses')}</option>
+              <option value="unpaid">{t('fixed.pending')}</option>
+              <option value="paid">{t('fixed.paidFilter')}</option>
             </select>
           </div>
         </div>
@@ -222,16 +226,16 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
       {/* Yeni Fatura Ekleme Formu (Açılırsa) */}
       {isAdding && (
         <form onSubmit={handleSaveNew} className="p-4 bg-zinc-50 dark:bg-zinc-800/80 border-b border-zinc-200 dark:border-zinc-800 space-y-3 text-xs">
-          <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Yeni Sabit Gider / Fatura Ekle</div>
+          <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">{t('fixed.addNewBill')}</div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                Fatura / Gider Adı *
+                {t('fixed.billNameLabel')}
               </label>
               <input
                 type="text"
-                placeholder="Örn: Elektrik, Su, Ev Kirası"
+                placeholder={t('fixed.billNamePlaceholder')}
                 value={newTitle}
                 onChange={e => setNewTitle(e.target.value)}
                 required
@@ -241,7 +245,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
 
             <div>
               <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                Aylık Beklenen Tutar (₺) *
+                {t('fixed.expectedAmount')}
               </label>
               <input
                 type="text"
@@ -258,7 +262,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                Sorumlu Kişi
+                {t('fixed.person')}
               </label>
               <select
                 value={newPerson}
@@ -266,14 +270,14 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                 className="w-full px-2.5 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
               >
                 {persons.map(p => (
-                  <option key={p.id} value={p.id}>{p.avatar} {p.name}</option>
+                  <option key={p.id} value={p.id}>{p.avatar} {translatePerson(p)}</option>
                 ))}
               </select>
             </div>
 
             <div>
               <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                Kategori
+                {t('fixed.category')}
               </label>
               <select
                 value={newCategory}
@@ -281,20 +285,20 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                 className="w-full px-2.5 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
               >
                 {categories.map(c => (
-                  <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                  <option key={c.id} value={c.id}>{c.icon} {translateCategory(c)}</option>
                 ))}
               </select>
             </div>
 
             <div>
               <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                Ödeme Günü
+                {t('fixed.dueDate')}
               </label>
               <input
                 type="number"
                 min="1"
                 max="31"
-                placeholder="Örn: 15 (İsteğe bağlı)"
+                placeholder="15"
                 value={newDueDate}
                 onChange={e => setNewDueDate(e.target.value)}
                 className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
@@ -308,13 +312,13 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
               onClick={() => setIsAdding(false)}
               className="px-3 py-1 rounded border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition cursor-pointer"
             >
-              Vazgeç
+              {t('fixed.cancelBtn')}
             </button>
             <button
               type="submit"
               className="px-3 py-1 rounded bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition cursor-pointer"
             >
-              Ekle
+              {t('modals.saveBtn')}
             </button>
           </div>
         </form>
@@ -327,12 +331,12 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
             <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400 dark:text-zinc-500 mb-2">
               <Calendar className="w-5 h-5 text-zinc-400 dark:text-zinc-500" />
             </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Bu kriterde sabit gider bulunamadı.</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{t('fixed.noBillsFound')}</p>
             <button
               onClick={() => setIsAdding(true)}
               className="mt-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
             >
-              Hemen yeni bir fatura ekle
+              {t('fixed.addBillNow')}
             </button>
           </div>
         ) : (
@@ -352,7 +356,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                 <div className="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">
                   <button
                     onClick={() => onTogglePaid(item.id)}
-                    aria-label={item.isPaid ? 'Ödendi olarak işaretlendi, geri al' : 'Ödendi olarak işaretle'}
+                    aria-label={item.isPaid ? t('fixed.markUnpaid') : t('fixed.markPaid')}
                     className={`w-6 h-6 rounded-md flex items-center justify-center transition cursor-pointer shrink-0 border mt-0.5 sm:mt-0 ${
                       item.isPaid
                         ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
@@ -365,10 +369,10 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className={`text-xs sm:text-sm font-semibold truncate ${item.isPaid ? 'text-zinc-600 dark:text-zinc-400 line-through' : 'text-zinc-900 dark:text-zinc-100'}`}>
-                        {item.title}
+                        {translateTemplate(item.title)}
                       </span>
                       {category && (
-                        <span className="text-xs text-zinc-400 dark:text-zinc-500" title={category.name}>
+                        <span className="text-xs text-zinc-400 dark:text-zinc-500" title={translateCategory(category)}>
                           {category.icon}
                         </span>
                       )}
@@ -381,7 +385,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                       {person && (
                         <span className="inline-flex items-center gap-1">
                           <span>{person.avatar}</span>
-                          <span className="text-zinc-600 dark:text-zinc-300">{person.name}</span>
+                          <span className="text-zinc-600 dark:text-zinc-300">{translatePerson(person)}</span>
                         </span>
                       )}
                       {item.note && (
@@ -416,13 +420,13 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                         onClick={() => saveEditAmount(item.id)}
                         className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline px-1 cursor-pointer"
                       >
-                        Tamam
+                        {t('fixed.saveAmount')}
                       </button>
                     </div>
                   ) : (
                     <button
                       onClick={() => startEditAmount(item)}
-                      title="Tutarı düzenle"
+                      title={t('fixed.editAmountTitle')}
                       className="group/btn flex items-center gap-1 text-right cursor-pointer"
                     >
                       <span className={`text-xs sm:text-sm font-bold ${item.isPaid ? 'text-zinc-600 dark:text-zinc-400' : 'text-zinc-900 dark:text-zinc-100'}`}>
@@ -442,7 +446,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                     <button
                       onClick={() => onEditFixedExpense(item)}
                       className="text-zinc-400 dark:text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 p-1 rounded-md transition cursor-pointer"
-                      title="Faturayı detaylı düzenle"
+                      title={t('common.edit')}
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
@@ -450,7 +454,7 @@ export const FixedExpensesCard: React.FC<FixedExpensesCardProps> = ({
                     <button
                       onClick={() => onDeleteExpense(item.id)}
                       className="text-zinc-300 dark:text-zinc-600 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 p-1 rounded-md transition cursor-pointer"
-                      title="Bu sabit gideri sil"
+                      title={t('common.delete')}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

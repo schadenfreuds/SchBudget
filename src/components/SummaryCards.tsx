@@ -115,9 +115,13 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
               <span className="flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" /> {formatMoney(fixedPending)} {t('summary.fixedPendingSub')}
               </span>
+            ) : fixedPaid > 0 ? (
+              <span className="flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5" /> {t('summary.allBillsPaid')}
+              </span>
             ) : (
               <span className="flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> {t('summary.fixedPaidSub')}
+                <CheckCircle2 className="w-3.5 h-3.5" /> {t('summary.noBillsPending')}
               </span>
             )}
           </div>
