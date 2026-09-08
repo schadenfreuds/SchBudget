@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { AppSettings, Person, Category, FixedExpenseTemplate } from '@/types/budget';
+import { AppSettings, Person, Category } from '@/types/budget';
 import {
   X, Plus, Trash2, Cloud, Check, Wrench,
-  Download, Upload, RefreshCw, AlertTriangle,
-  BookmarkCheck, Tag, Users
+  Download, Upload, AlertTriangle,
+  Tag, Users
 } from 'lucide-react';
 import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
 import { downloadBackupFile, restoreBackupFile, clearAllLocalData } from '@/lib/backup';
@@ -31,7 +31,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onLoadMockup,
   onDataRestored,
 }) => {
-  const [activeTab, setActiveTab] = useState<'persons' | 'templates' | 'categories' | 'backup' | 'cloud' | 'devtools'>('persons');
+  const [activeTab, setActiveTab] = useState<'persons' | 'categories' | 'backup' | 'cloud' | 'devtools'>('persons');
 
   // --- 1. KİŞİLER ---
   const [persons, setPersons] = useState<Person[]>(settings.persons || []);
@@ -80,44 +80,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     onSaveSettings({ ...settings, persons: updatedPersons });
   };
 
-  // --- 2. SABİT GİDER ŞABLONLARI ---
-  const [templates, setTemplates] = useState<FixedExpenseTemplate[]>(settings.defaultFixedExpenses || []);
-  const [newTplTitle, setNewTplTitle] = useState('');
-  const [newTplAmount, setNewTplAmount] = useState('');
-  const [newTplCategory, setNewTplCategory] = useState(settings.categories[0]?.id || 'fatura');
-  const [newTplPerson, setNewTplPerson] = useState(persons[0]?.id || 'ortak');
-  const [newTplDueDate, setNewTplDueDate] = useState('');
-
-  const handleAddTemplate = (e: React.FormEvent) => {
-    e.preventDefault();
-    const parsed = parseFormattedAmount(newTplAmount);
-    if (!newTplTitle.trim()) return;
-
-    const newTemplate: FixedExpenseTemplate = {
-      id: `tpl_${Date.now()}`,
-      title: newTplTitle.trim(),
-      expectedAmount: parsed,
-      categoryId: newTplCategory,
-      personId: newTplPerson,
-      dueDate: newTplDueDate ? parseInt(newTplDueDate, 10) : undefined,
-    };
-
-    const updated = [...templates, newTemplate];
-    setTemplates(updated);
-    onSaveSettings({ ...settings, defaultFixedExpenses: updated });
-
-    setNewTplTitle('');
-    setNewTplAmount('');
-    setNewTplDueDate('');
-  };
-
-  const handleDeleteTemplate = (index: number) => {
-    const updated = templates.filter((_, i) => i !== index);
-    setTemplates(updated);
-    onSaveSettings({ ...settings, defaultFixedExpenses: updated });
-  };
-
-  // --- 3. KATEGORİLER ---
+  // --- 2. KATEGORİLER ---
   const [categories, setCategories] = useState<Category[]>(settings.categories || []);
   const [newCatName, setNewCatName] = useState('');
   const [newCatIcon, setNewCatIcon] = useState('✨');
@@ -229,18 +192,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           >
             <Users className="w-3.5 h-3.5" />
             <span>Kişiler</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('templates')}
-            className={`pb-2.5 transition border-b-2 cursor-pointer flex items-center gap-1.5 shrink-0 ${
-              activeTab === 'templates'
-                ? 'border-emerald-600 text-emerald-700'
-                : 'border-transparent text-zinc-500 hover:text-zinc-800'
-            }`}
-          >
-            <BookmarkCheck className="w-3.5 h-3.5" />
-            <span>Rutin Faturalar (Şablon)</span>
           </button>
 
           <button
@@ -404,127 +355,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           )}
 
-          {/* 2. SABİT GİDER ŞABLONLARI SEKME */}
-          {activeTab === 'templates' && (
-            <div className="space-y-4">
-              <div className="bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-900">
-                <p className="font-semibold">Her Yeni Ayda Otomatik Başlayan Faturalar</p>
-                <p className="text-[11px] text-amber-800 mt-0.5">
-                  Her ay takvimi yeni bir aya çevirdiğinizde kira, aidat ve rutin faturalar bu şablondan otomatik olarak çekilir.
-                </p>
-              </div>
-
-              {/* Şablon Listesi */}
-              <div className="divide-y divide-zinc-100 border border-zinc-200 rounded-xl overflow-hidden bg-white max-h-56 overflow-y-auto">
-                {templates.map((tpl, idx) => (
-                  <div key={idx} className="p-2.5 flex items-center justify-between gap-3 hover:bg-zinc-50">
-                    <div>
-                      <div className="font-bold text-zinc-800">{tpl.title}</div>
-                      <div className="text-[10px] text-zinc-500 flex items-center gap-1.5 mt-0.5">
-                        <span>Varsayılan: <strong>{tpl.expectedAmount.toLocaleString('tr-TR')} ₺</strong></span>
-                        {tpl.dueDate && <span>• Ayın {tpl.dueDate}&apos;si</span>}
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteTemplate(idx)}
-                      className="text-zinc-300 hover:text-rose-600 p-1 transition cursor-pointer"
-                      title="Şablonu sil"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Yeni Şablon Ekle */}
-              <form onSubmit={handleAddTemplate} className="bg-zinc-50 border border-zinc-200 p-3.5 rounded-xl space-y-3">
-                <div className="font-bold text-zinc-800 text-xs flex items-center gap-1.5">
-                  <Plus className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Yeni Sabit Fatura Şablonu Ekle</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-zinc-600 mb-1">Gider Adı *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Örn: Netflix, Spor Salonu, Kira..."
-                      value={newTplTitle}
-                      onChange={e => setNewTplTitle(e.target.value)}
-                      className="w-full px-3 py-1.5 bg-white border border-zinc-300 rounded-lg text-xs"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-zinc-600 mb-1">Varsayılan Tutar (₺)</label>
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      placeholder="0"
-                      value={newTplAmount}
-                      onChange={e => setNewTplAmount(formatAmountInput(e.target.value))}
-                      className="w-full px-3 py-1.5 bg-white border border-zinc-300 rounded-lg text-xs font-bold"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-zinc-600 mb-1">Kategori</label>
-                    <select
-                      value={newTplCategory}
-                      onChange={e => setNewTplCategory(e.target.value)}
-                      className="w-full px-2 py-1.5 bg-white border border-zinc-300 rounded-lg text-xs"
-                    >
-                      {categories.map(c => (
-                        <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-zinc-600 mb-1">Sorumlu Kişi</label>
-                    <select
-                      value={newTplPerson}
-                      onChange={e => setNewTplPerson(e.target.value)}
-                      className="w-full px-2 py-1.5 bg-white border border-zinc-300 rounded-lg text-xs"
-                    >
-                      {persons.map(p => (
-                        <option key={p.id} value={p.id}>{p.avatar} {p.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-zinc-600 mb-1">Son Gün (1-31)</label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="31"
-                      placeholder="Örn: 15"
-                      value={newTplDueDate}
-                      onChange={e => setNewTplDueDate(e.target.value)}
-                      className="w-full px-2 py-1.5 bg-white border border-zinc-300 rounded-lg text-xs"
-                    />
-                  </div>
-                </div>
-
-                <div className="pt-1 flex justify-end">
-                  <button
-                    type="submit"
-                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition cursor-pointer"
-                  >
-                    Şablonlara Ekle
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-
-          {/* 3. KATEGORİLER SEKME */}
+          {/* 2. KATEGORİLER SEKME */}
           {activeTab === 'categories' && (
             <div className="space-y-4">
               <div className="bg-sky-50 border border-sky-200 p-3 rounded-xl text-sky-900">
