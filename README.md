@@ -1,6 +1,6 @@
 # 🏡 SchBudget
 
-> Karmaşık Excel formüllerinden ve kaybolan tablolardan bunalan evler ve bireyler için tasarlanmış; sıfır sürtünmeli, modern, çok dilli (TR / EN), çoklu para birimli ve çevrimdışı (offline-first) bütçe ve ev muhasebesi uygulaması.
+> **Part of The Sch Suite** — Karmaşık Excel formüllerinden ve kaybolan tablolardan bunalan evler ve bireyler için tasarlanmış; sıfır sürtünmeli, modern, çok dilli (TR / EN), çoklu para birimli ve çevrimdışı (offline-first) bütçe ve ev muhasebesi uygulaması.
 >
 > *Clean, zero-friction, privacy-first personal and family budget tracker with dual storage (LocalStorage & Cloud Sync).*
 
@@ -8,6 +8,7 @@
 [![React](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+[![Sch Suite](https://img.shields.io/badge/Ecosystem-The_Sch_Suite-10b981?style=flat-square)](https://github.com/schadenfreuds/SchBudget)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg?style=flat-square)](LICENSE)
 
 ---
