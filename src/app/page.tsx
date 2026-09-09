@@ -14,7 +14,7 @@ import {
   getMockupMonthBudget,
 } from '@/lib/storage';
 import { clearAllLocalData } from '@/lib/backup';
-import { initFirebase, subscribeToMonth, saveMonthToFirebase } from '@/lib/firebase';
+import { initFirebase, subscribeToMonth, saveMonthToFirebase, parseFirebaseConfigInput, disconnectFirebase, testFirebaseConnection } from '@/lib/firebase';
 import { exportBudgetToExcel } from '@/lib/excelExport';
 import { useI18n } from '@/context/I18nContext';
 
@@ -293,19 +293,42 @@ export default function Home() {
   };
 
   // 11. Firebase Bağlantısı
-  const handleConnectFirebase = (configStr: string) => {
+  const handleConnectFirebase = async (configStr: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      const parsed = JSON.parse(configStr);
+      const parsed = parseFirebaseConfigInput(configStr);
+      if (!parsed) {
+        return {
+          success: false,
+          error: 'Geçerli bir Firebase yapılandırması bulunamadı. Lütfen JSON, JS veya .env formatında bir yapılandırma girin.',
+        };
+      }
+
       localStorage.setItem('sch_budget_firebase_config', JSON.stringify(parsed));
       localStorage.setItem('aile_butcesi_firebase_config', JSON.stringify(parsed));
-      const db = initFirebase();
-      setIsCloudConnected(!!db);
-      if (budget) {
-        saveMonthWithCloud(budget);
+
+      const db = initFirebase(true);
+      if (!db) {
+        return { success: false, error: 'Firebase başlatılamadı. API anahtarı veya Project ID değerini kontrol edin.' };
       }
-    } catch {
-      alert('Firebase yapılandırma formatı geçersiz. Lütfen geçerli bir JSON girin.');
+
+      const test = await testFirebaseConnection();
+      if (!test.success) {
+        return { success: false, error: test.error || 'Firestore bağlantı hatası oluştu.' };
+      }
+
+      setIsCloudConnected(true);
+      if (budget) {
+        await saveMonthToFirebase(budget);
+      }
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: String(err) };
     }
+  };
+
+  const handleDisconnectFirebase = () => {
+    disconnectFirebase();
+    setIsCloudConnected(false);
   };
 
   return (
@@ -685,6 +708,7 @@ export default function Home() {
         settings={settings}
         onSaveSettings={handleSaveSettings}
         onConnectFirebase={handleConnectFirebase}
+        onDisconnectFirebase={handleDisconnectFirebase}
         isCloudConnected={isCloudConnected}
         onLoadMockup={handleLoadMockup}
         onResetAllData={handleResetAllData}

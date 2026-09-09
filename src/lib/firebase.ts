@@ -5,6 +5,70 @@ import { MonthlyBudget } from '@/types/budget';
 let app: FirebaseApp | null = null;
 let db: Firestore | null = null;
 
+// Akıllı Yapılandırma Ayrıştırıcı (JSON, JS Objesi, .env formatlarını otomatik çözer)
+export function parseFirebaseConfigInput(input: string): Record<string, string> | null {
+  if (!input || !input.trim()) return null;
+  const clean = input.trim();
+
+  // 1. Standart JSON
+  try {
+    const parsed = JSON.parse(clean);
+    if (parsed && typeof parsed === 'object' && parsed.apiKey && parsed.projectId) {
+      return parsed;
+    }
+  } catch {}
+
+  // 2. JS / .env formatlarından Regex ile çıkarım
+  const extract = (key: string, envKey: string) => {
+    const envPattern = new RegExp(`(?:NEXT_PUBLIC_FIREBASE_${envKey}|FIREBASE_${envKey}|${envKey})\\s*=\\s*['"]?([^'\"\\r\\n,;]+)['"]?`, 'i');
+    const envMatch = clean.match(envPattern);
+    if (envMatch) return envMatch[1].trim();
+
+    const jsPattern = new RegExp(`['"]?${key}['"]?\\s*:\\s*['"]([^'"]+)['"]`, 'i');
+    const jsMatch = clean.match(jsPattern);
+    if (jsMatch) return jsMatch[1].trim();
+
+    return '';
+  };
+
+  const apiKey = extract('apiKey', 'API_KEY');
+  const projectId = extract('projectId', 'PROJECT_ID');
+
+  if (apiKey && projectId) {
+    return {
+      apiKey,
+      projectId,
+      authDomain: extract('authDomain', 'AUTH_DOMAIN') || `${projectId}.firebaseapp.com`,
+      storageBucket: extract('storageBucket', 'STORAGE_BUCKET') || `${projectId}.firebasestorage.app`,
+      messagingSenderId: extract('messagingSenderId', 'MESSAGING_SENDER_ID'),
+      appId: extract('appId', 'APP_ID'),
+    };
+  }
+
+  return null;
+}
+
+// Firebase instance sıfırlayıcı
+export function resetFirebaseInstance() {
+  app = null;
+  db = null;
+}
+
+// Bağlı olan Firebase projesinin kimliğini döner
+export function getCurrentFirebaseProject(): string | null {
+  const config = getFirebaseConfig();
+  return config?.projectId || null;
+}
+
+// Firebase bağlantısını kaldırır ve yerel moda çeker
+export function disconnectFirebase() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('sch_budget_firebase_config');
+    localStorage.removeItem('aile_butcesi_firebase_config');
+  }
+  resetFirebaseInstance();
+}
+
 // Firebase config can come from environment variables or custom config
 export function getFirebaseConfig() {
   if (typeof window === 'undefined') return null;
@@ -34,8 +98,8 @@ export function getFirebaseConfig() {
   return null;
 }
 
-export function initFirebase(): Firestore | null {
-  if (db) return db;
+export function initFirebase(force = false): Firestore | null {
+  if (db && !force) return db;
 
   const config = getFirebaseConfig();
   if (!config || !config.apiKey || !config.projectId) {
@@ -43,12 +107,31 @@ export function initFirebase(): Firestore | null {
   }
 
   try {
-    app = getApps().length === 0 ? initializeApp(config) : getApp();
+    if (getApps().length === 0 || force) {
+      app = initializeApp(config, force ? `schbudget-${Date.now()}` : undefined);
+    } else {
+      app = getApp();
+    }
     db = getFirestore(app);
     return db;
   } catch (err) {
     console.warn('Firebase başlatılamadı, yerel modda devam ediliyor:', err);
     return null;
+  }
+}
+
+// Canlı test fonksiyonu: Firestore'a sağlık kontrolü yazıp okur
+export async function testFirebaseConnection(): Promise<{ success: boolean; error?: string }> {
+  const firestore = initFirebase();
+  if (!firestore) return { success: false, error: 'Firebase yapılandırması eksik veya başlatılamadı.' };
+
+  try {
+    const testDoc = doc(firestore, 'budgets', '__health_check__');
+    await setDoc(testDoc, { ping: true, time: new Date().toISOString() });
+    return { success: true };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, error: message };
   }
 }
 
@@ -75,8 +158,10 @@ export async function saveMonthToFirebase(budget: MonthlyBudget): Promise<boolea
 
   try {
     const docRef = doc(firestore, 'budgets', budget.monthKey);
+    // Firestore undefined alanları kabul etmediği için JSON ile sterilize ediyoruz
+    const cleanBudget = JSON.parse(JSON.stringify(budget));
     await setDoc(docRef, {
-      ...budget,
+      ...cleanBudget,
       updatedAt: new Date().toISOString(),
     }, { merge: true });
     return true;

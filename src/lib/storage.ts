@@ -170,6 +170,9 @@ export async function loadMonthWithCloud(monthKey: string): Promise<MonthlyBudge
     if (remote) {
       saveLocalMonth(remote);
       return remote;
+    } else if (local) {
+      // Bulutta henüz bu ayın kaydı yoksa, yerel veriyi buluta aktar
+      saveMonthToFirebase(local).catch(() => {});
     }
   } catch {
     // Cloud erişilemezse yerel ile devam

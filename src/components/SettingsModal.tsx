@@ -6,20 +6,22 @@ import {
   X, Plus, Trash2, Cloud, Check, Wrench,
   Download, Upload, AlertTriangle,
   Tag, Users, Palette, Sun, Moon, Monitor,
-  Globe, Coins
+  Globe, Coins, CloudOff, RefreshCw
 } from 'lucide-react';
 import { formatAmountInput, parseFormattedAmount } from '@/lib/formatters';
 import { downloadBackupFile, restoreBackupFile, clearAllLocalData } from '@/lib/backup';
 import { getStoredTheme, setTheme, ThemeMode } from '@/lib/theme';
 import { useI18n } from '@/context/I18nContext';
 import { CURRENCIES, CurrencyCode, Language } from '@/lib/i18n';
+import { getCurrentFirebaseProject, testFirebaseConnection } from '@/lib/firebase';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   settings: AppSettings;
   onSaveSettings: (settings: AppSettings) => void;
-  onConnectFirebase: (configStr: string) => void;
+  onConnectFirebase: (configStr: string) => Promise<{ success: boolean; error?: string }> | void;
+  onDisconnectFirebase?: () => void;
   isCloudConnected: boolean;
   onLoadMockup?: () => void;
   onDataRestored?: () => void;
@@ -32,6 +34,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   settings,
   onSaveSettings,
   onConnectFirebase,
+  onDisconnectFirebase,
   isCloudConnected,
   onLoadMockup,
   onDataRestored,
@@ -174,13 +177,55 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   // --- 5. FIREBASE ---
   const [firebaseInput, setFirebaseInput] = useState('');
+  const [isConnecting, setIsConnecting] = useState(false);
   const [cloudSuccessMsg, setCloudSuccessMsg] = useState(false);
+  const [cloudErrorMsg, setCloudErrorMsg] = useState<string | null>(null);
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
 
-  const handleSaveFirebase = () => {
-    if (!firebaseInput.trim()) return;
-    onConnectFirebase(firebaseInput.trim());
-    setCloudSuccessMsg(true);
-    setTimeout(() => setCloudSuccessMsg(false), 3000);
+  const activeProject = isCloudConnected ? getCurrentFirebaseProject() : null;
+
+  const handleSaveFirebase = async () => {
+    if (!firebaseInput.trim() || isConnecting) return;
+    setIsConnecting(true);
+    setCloudErrorMsg(null);
+    setCloudSuccessMsg(false);
+    setTestResult(null);
+
+    try {
+      const res = await onConnectFirebase(firebaseInput.trim());
+      if (res && !res.success) {
+        setCloudErrorMsg(res.error || 'Bağlantı kurulamadı.');
+      } else {
+        setCloudSuccessMsg(true);
+        setFirebaseInput('');
+        setTimeout(() => setCloudSuccessMsg(false), 3500);
+      }
+    } catch (err) {
+      setCloudErrorMsg(String(err));
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  const handleTestConnection = async () => {
+    setIsTesting(true);
+    setTestResult(null);
+    try {
+      const res = await testFirebaseConnection();
+      if (res.success) {
+        setTestResult({
+          success: true,
+          message: lang === 'en' ? 'Firestore connection healthy! Live read/write test passed. ✅' : 'Firestore bağlantısı sağlıklı! Canlı okuma/yazma testi başarılı. ✅',
+        });
+      } else {
+        setTestResult({ success: false, message: res.error || (lang === 'en' ? 'Error testing Firestore.' : 'Firestore testinde hata alındı.') });
+      }
+    } catch (err) {
+      setTestResult({ success: false, message: String(err) });
+    } finally {
+      setIsTesting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -708,43 +753,104 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* 5. BULUT (FIREBASE) SEKME */}
           {activeTab === 'cloud' && (
             <div className="space-y-4">
-              <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 p-3 rounded-xl text-emerald-800 dark:text-emerald-300">
-                <div className="flex items-center gap-2 font-bold text-xs">
-                  <Cloud className="w-4 h-4" />
-                  <span>{t('settings.cloud.statusLabel')} {isCloudConnected ? t('settings.cloud.statusConnected') : t('settings.cloud.statusLocal')}</span>
+              <div className={`p-3.5 rounded-xl border ${
+                isCloudConnected
+                  ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40 text-emerald-800 dark:text-emerald-300'
+                  : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-bold text-xs">
+                    {isCloudConnected ? <Cloud className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> : <CloudOff className="w-4 h-4 text-zinc-400" />}
+                    <span>{t('settings.cloud.statusLabel')} {isCloudConnected ? t('settings.cloud.statusConnected') : t('settings.cloud.statusLocal')}</span>
+                  </div>
+                  {activeProject && (
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200">
+                      {activeProject}
+                    </span>
+                  )}
                 </div>
-                <p className="text-[11px] mt-1 text-emerald-700 dark:text-emerald-400">
-                  {t('settings.cloud.desc')}
+                <p className="text-[11px] mt-1 text-zinc-600 dark:text-zinc-400">
+                  {isCloudConnected 
+                    ? (lang === 'en' ? 'Live synchronization is active. All expenses, bills and budgets are synced across your devices via Firestore.' : 'Canlı senkronizasyon aktif. Tüm harcama, fatura ve bütçeleriniz Firestore üzerinden cihazlarınız arasında eşzamanlanır.')
+                    : t('settings.cloud.desc')}
                 </p>
+
+                {isCloudConnected && (
+                  <div className="flex items-center gap-2 pt-2.5 mt-2 border-t border-emerald-200 dark:border-emerald-900/50">
+                    <button
+                      type="button"
+                      onClick={handleTestConnection}
+                      disabled={isTesting}
+                      className="px-2.5 py-1 text-xs font-semibold rounded bg-emerald-600 hover:bg-emerald-700 text-white transition cursor-pointer flex items-center gap-1.5"
+                    >
+                      <RefreshCw className={`w-3 h-3 ${isTesting ? 'animate-spin' : ''}`} />
+                      <span>{isTesting ? (lang === 'en' ? 'Testing...' : 'Test Ediliyor...') : (lang === 'en' ? 'Test Connection' : 'Bağlantıyı Test Et')}</span>
+                    </button>
+                    {onDisconnectFirebase && (
+                      <button
+                        type="button"
+                        onClick={onDisconnectFirebase}
+                        className="px-2.5 py-1 text-xs font-semibold rounded bg-zinc-200 dark:bg-zinc-700 hover:bg-rose-100 hover:text-rose-700 dark:hover:bg-rose-950/50 dark:hover:text-rose-300 text-zinc-700 dark:text-zinc-300 transition cursor-pointer"
+                      >
+                        {lang === 'en' ? 'Disconnect Cloud' : 'Bağlantıyı Kes (Yerel Mod)'}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                  {t('settings.cloud.jsonLabel')}
-                </label>
+              {testResult && (
+                <div className={`p-2.5 rounded-xl border text-xs font-medium ${
+                  testResult.success 
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                    : 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+                }`}>
+                  {testResult.message}
+                </div>
+              )}
+
+              {/* Yeni Yapılandırma Ekle veya Güncelle */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                    {isCloudConnected ? (lang === 'en' ? 'Update Firebase Configuration' : 'Yapılandırmayı Güncelle') : t('settings.cloud.jsonLabel')}
+                  </label>
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
+                    {lang === 'en' ? 'JSON, JS snippet or .env accepted' : 'JSON, JS kodu veya .env formatı'}
+                  </span>
+                </div>
+
                 <textarea
-                  rows={6}
-                  placeholder={`{\n  "apiKey": "AIzaSy...",\n  "authDomain": "proje.firebaseapp.com",\n  "projectId": "proje-id",\n  "storageBucket": "proje.appspot.com",\n  "messagingSenderId": "...",\n  "appId": "..."\n}`}
+                  rows={5}
+                  placeholder={`{\n  "apiKey": "AIzaSy...",\n  "projectId": "proje-id",\n  "authDomain": "proje.firebaseapp.com",\n  ...\n}`}
                   value={firebaseInput}
                   onChange={e => setFirebaseInput(e.target.value)}
                   className="w-full px-3 py-2 text-xs font-mono border border-zinc-300 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
                 />
-              </div>
 
-              <div className="flex items-center justify-between pt-1">
-                {cloudSuccessMsg ? (
-                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                    <Check className="w-4 h-4" /> {t('settings.cloud.saveSuccess')}
-                  </span>
-                ) : <span />}
+                {cloudErrorMsg && (
+                  <div className="p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs">
+                    {cloudErrorMsg}
+                  </div>
+                )}
 
-                <button
-                  type="button"
-                  onClick={handleSaveFirebase}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition cursor-pointer shadow-xs"
-                >
-                  {t('settings.cloud.saveBtn')}
-                </button>
+                <div className="flex items-center justify-between pt-1">
+                  {cloudSuccessMsg ? (
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                      <Check className="w-4 h-4" /> {t('settings.cloud.saveSuccess')}
+                    </span>
+                  ) : <span />}
+
+                  <button
+                    type="button"
+                    onClick={handleSaveFirebase}
+                    disabled={isConnecting || !firebaseInput.trim()}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-lg transition cursor-pointer shadow-xs flex items-center gap-1.5"
+                  >
+                    {isConnecting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{isConnecting ? (lang === 'en' ? 'Connecting...' : 'Bağlanıyor...') : t('settings.cloud.saveBtn')}</span>
+                  </button>
+                </div>
               </div>
             </div>
           )}
